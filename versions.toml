@@ -1,0 +1,8 @@
+[versions]
+okio    = { strictly = "[3.0,3.1[", prefer = "3.0.0.alpha.10" }
+kxsJson = { strictly = "[1.3,1.4[", prefer = "1.3.0"          }
+
+[libraries]
+okio                       = { group = "com.squareup.okio",     name = "okio",                       version.ref = "okio"     }
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kxsJson"  }
+kotest                     = { group = "io.kotest",             name = "kotest-runner-junit5",       version     = "5.0.0.M2" }
