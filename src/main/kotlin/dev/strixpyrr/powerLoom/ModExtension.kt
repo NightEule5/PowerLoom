@@ -13,13 +13,10 @@
 // limitations under the License.
 package dev.strixpyrr.powerLoom
 
-import org.gradle.api.Plugin
-import org.gradle.api.Project
-
-class PowerLoomPlugin : Plugin<Project>
+class ModExtension internal constructor()
 {
-	override fun apply(target: Project)
+	companion object
 	{
-		target.extensions.add(ModExtension::class.java, ModExtension.Name, ModExtension())
+		internal const val Name = "mod"
 	}
 }
