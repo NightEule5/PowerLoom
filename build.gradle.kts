@@ -4,7 +4,8 @@ import dev.strixpyrr.shorthand.JvmDefaultMode.All
 import dev.strixpyrr.shorthand.freeCompilerArgs
 
 plugins {
-	kotlin("jvm") version "1.5.31"
+	kotlin("jvm")                  version "1.5.31"
+	kotlin("plugin.serialization") version "1.5.31"
 	id("dev.strixpyrr.shorthand")
 	`java-gradle-plugin`
 }

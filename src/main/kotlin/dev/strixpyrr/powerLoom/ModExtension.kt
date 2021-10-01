@@ -13,8 +13,12 @@
 // limitations under the License.
 package dev.strixpyrr.powerLoom
 
+import dev.strixpyrr.powerLoom.metadata.MutableFabricMod
+
 class ModExtension internal constructor()
 {
+	var metadata = MutableFabricMod()
+	
 	companion object
 	{
 		internal const val Name = "mod"
