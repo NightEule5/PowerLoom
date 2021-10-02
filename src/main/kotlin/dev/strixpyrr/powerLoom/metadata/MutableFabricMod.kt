@@ -298,5 +298,5 @@ class MutableContactInfo(
 }
 
 class FieldNotSetException(name: String) : Exception(
-	message = "The field $name is required but hasn't been set."
+	"The field $name is required but hasn't been set."
 )
