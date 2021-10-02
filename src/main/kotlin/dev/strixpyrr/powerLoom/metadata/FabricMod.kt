@@ -35,8 +35,8 @@ data class FabricMod internal constructor(
 	val environment     : Environment = Environment.Either,
 	@SerialName("entrypoints")
 	val entryPoints     : EntryPoints?,
-	val jars            : List<NestedJar>?,
-	val mixins          : List<Mixin>?,
+	val jars            : Set<NestedJar>?,
+	val mixins          : Set<Mixin>?,
 	val languageAdapters: Map<String, String>?,
 	val depends         : Map<String, String>?,
 	val recommends      : Map<String, String>?,
@@ -61,8 +61,8 @@ data class FabricMod internal constructor(
 		version         : String,
 		environment     : Environment         = Environment.Either,
 		entryPoints     : EntryPoints         = EntryPoints(),
-		jars            : List<NestedJar>     = emptyList(),
-		mixins          : List<Mixin>         = emptyList(),
+		jars            : Set<NestedJar>      = emptySet(),
+		mixins          : Set<Mixin>          = emptySet(),
 		languageAdapters: Map<String, String> = emptyMap(),
 		depends         : Map<String, String> = emptyMap(),
 		recommends      : Map<String, String> = emptyMap(),
@@ -71,8 +71,8 @@ data class FabricMod internal constructor(
 		breaks          : Map<String, String> = emptyMap(),
 		name            : String?             = null,
 		description     : String?             = null,
-		authors         : List<Person>        = emptyList(),
-		contributors    : List<Person>        = emptyList(),
+		authors         : Set<Person>         = emptySet(),
+		contributors    : Set<Person>         = emptySet(),
 		contact         : ContactInfo         = ContactInfo(),
 		license         : String?             = null,
 		icon            : Icon?               = null,
@@ -160,9 +160,9 @@ data class EntryPoint(
 @Serializable
 data class EntryPoints(
 	@SerialName("main")
-	val common: List<EntryPoint>? = null,
-	val server: List<EntryPoint>? = null,
-	val client: List<EntryPoint>? = null
+	val common: Set<EntryPoint>? = null,
+	val server: Set<EntryPoint>? = null,
+	val client: Set<EntryPoint>? = null
 )
 {
 	private val isEmpty get() =
@@ -251,7 +251,7 @@ data class ContactInfo internal constructor(
 		discord : URI?    = null,
 		slack   : URI?    = null,
 		twitter : URI?    = null,
-		additional: Map<String, URI>
+		additional: Map<String, URI> = emptyMap()
 	) : this(
 		email,
 		if (irc      != null) "$irc"      else null,

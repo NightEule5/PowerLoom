@@ -13,7 +13,7 @@
 // limitations under the License.
 package dev.strixpyrr.powerLoom.metadata
 
-internal fun <T> List<T>.nullIfEmpty() = ifEmpty { null }
+internal fun <C : Collection<*>> C.nullIfEmpty() = ifEmpty { null }
 
 internal fun <T> mutableList(capacity: Int): MutableList<T> = ArrayList(capacity)
 
@@ -34,3 +34,7 @@ internal fun <K, V> Map<K, V>?.toMutableMapWithSpaceFor(capacity: Int) =
 	if (isNullOrEmpty())
 		mutableMap(capacity)
 	else mutableMap(size + capacity, elements = this)
+
+internal infix fun Collection<*>?.sizeOr(default: Int) = this?.size ?: default
+
+internal infix fun Map<*, *>?.sizeOr(default: Int) = this?.size ?: default

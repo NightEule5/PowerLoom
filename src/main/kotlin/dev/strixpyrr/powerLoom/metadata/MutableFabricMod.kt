@@ -43,17 +43,29 @@ class MutableFabricMod(
 		version = immutable.version,
 		environment = immutable.environment,
 		entryPoints = immutable.entryPoints.intoMutable(),
-		jars   = immutable.jars  .toMutableListWithSpaceFor(NestedJarCapacity),
-		mixins = immutable.mixins.toMutableListWithSpaceFor(    MixinCapacity),
-		languageAdapters = immutable.languageAdapters.toMutableMapWithSpaceFor(AdapterCapacity),
+		jars   = mutableList(immutable.jars   sizeOr 0 + NestedJarCapacity),
+		mixins = mutableList(immutable.mixins sizeOr 0 +     MixinCapacity),
+		languageAdapters = mutableMap(immutable.languageAdapters sizeOr 0 + AdapterCapacity),
 		dependencies     = DependencyContainer(immutable),
 		metadata         =   MetadataContainer(immutable),
 		accessWidener    = immutable.accessWidener.toPath()
 	)
 	
-	fun populateFrom(immutable: FabricMod): Unit = TODO()
+	fun populateFrom(immutable: FabricMod) = this()
+	{
+		id      = immutable.id
+		version = immutable.version
+		environment = immutable.environment
+		
+		immutable.entryPoints     ?.let(entryPoints::populateWith)
+		immutable.jars            ?.let { jars             += it }
+		immutable.mixins          ?.let { mixins           += it }
+		immutable.languageAdapters?.let { languageAdapters += it }
+		
+		
+	}
 	
-	inline operator fun invoke(populate: MutableFabricMod.() -> Unit) = populate()
+	inline operator fun invoke(populate: MutableFabricMod.() -> Unit) = this.populate()
 	
 	fun freeze(): FabricMod
 	{
@@ -80,8 +92,8 @@ class MutableFabricMod(
 			version,
 			environment,
 			entryPoints,
-			jars,
-			mixins,
+			jars  .toSet(),
+			mixins.toSet(),
 			languageAdapters,
 			depends,
 			recommends,
@@ -90,8 +102,8 @@ class MutableFabricMod(
 			breaks,
 			name,
 			description,
-			authors,
-			contributors,
+			authors     .toSet(),
+			contributors.toSet(),
 			contact.freeze(),
 			license,
 			icon,
@@ -119,16 +131,26 @@ class MutableEntryPoints(
 )
 {
 	constructor(immutable: EntryPoints) : this(
-		common = immutable.common.toMutableListWithSpaceFor(EntryPointCapacity),
-		server = immutable.server.toMutableListWithSpaceFor(EntryPointCapacity),
-		client = immutable.client.toMutableListWithSpaceFor(EntryPointCapacity)
+		common = mutableList(immutable.common sizeOr EntryPointCapacity),
+		server = mutableList(immutable.server sizeOr EntryPointCapacity),
+		client = mutableList(immutable.client sizeOr EntryPointCapacity)
 	)
+	{
+		populateWith(immutable)
+	}
+	
+	fun populateWith(immutable: EntryPoints)
+	{
+		immutable.common?.let { common += it }
+		immutable.server?.let { server += it }
+		immutable.client?.let { client += it }
+	}
 	
 	fun freeze() =
 		EntryPoints(
-			common.nullIfEmpty(),
-			server.nullIfEmpty(),
-			client.nullIfEmpty()
+			common.toSet().nullIfEmpty(),
+			server.toSet().nullIfEmpty(),
+			client.toSet().nullIfEmpty()
 		)
 }
 
@@ -141,12 +163,24 @@ data class DependencyContainer(
 )
 {
 	constructor(immutable: FabricMod) : this(
-		depends    = immutable.depends   .toMutableMapWithSpaceFor(DependencyCapacity),
-		recommends = immutable.recommends.toMutableMapWithSpaceFor(DependencyCapacity),
-		suggests   = immutable.suggests  .toMutableMapWithSpaceFor(DependencyCapacity),
-		conflicts  = immutable.conflicts .toMutableMapWithSpaceFor(DependencyCapacity),
-		breaks     = immutable.breaks    .toMutableMapWithSpaceFor(DependencyCapacity)
+		depends    = mutableMap(immutable.depends    sizeOr DependencyCapacity),
+		recommends = mutableMap(immutable.recommends sizeOr DependencyCapacity),
+		suggests   = mutableMap(immutable.suggests   sizeOr DependencyCapacity),
+		conflicts  = mutableMap(immutable.conflicts  sizeOr DependencyCapacity),
+		breaks     = mutableMap(immutable.breaks     sizeOr DependencyCapacity)
 	)
+	{
+		populateWith(immutable)
+	}
+	
+	fun populateWith(immutable: FabricMod)
+	{
+		immutable.depends   ?.let { depends    += it }
+		immutable.recommends?.let { recommends += it }
+		immutable.suggests  ?.let { suggests   += it }
+		immutable.conflicts ?.let { conflicts  += it }
+		immutable.breaks    ?.let { breaks     += it }
+	}
 }
 
 data class MetadataContainer(
@@ -155,24 +189,39 @@ data class MetadataContainer(
 	val authors     : MutableList<Person> = mutableList(PersonCapacity),
 	val contributors: MutableList<Person> = mutableList(PersonCapacity),
 	val contact     : MutableContactInfo = MutableContactInfo(),
-	val license     : String? = null,
+	var license     : String? = null,
 	var icon        : Icon?   = null,
 )
 {
 	constructor(immutable: FabricMod) : this(
 		name         = immutable.name,
 		description  = immutable.description,
-		authors      = immutable.authors.peopleIntoMutableList(),
-		contributors = immutable.contributors.peopleIntoMutableList(),
+		authors      = mutableList(immutable.authors      sizeOr 0 + PersonCapacity),
+		contributors = mutableList(immutable.contributors sizeOr 0 + PersonCapacity),
 		contact      = immutable.contact.intoMutable(),
 		license      = immutable.license,
 		icon         = immutable.icon
 	)
-	
-	companion object
 	{
-		internal fun List<Person>?.peopleIntoMutableList() =
-			toMutableListWithSpaceFor(PersonCapacity)
+		populatePeople(immutable)
+	}
+	
+	fun populateWith(immutable: FabricMod)
+	{
+		name        = immutable.name
+		description = immutable.description
+		license     = immutable.license
+		icon        = immutable.icon
+		
+		populatePeople(immutable)
+		
+		immutable.contact?.let(contact::populateWith)
+	}
+	
+	private fun populatePeople(immutable: FabricMod)
+	{
+		immutable.authors     ?.let { authors      += it }
+		immutable.contributors?.let { contributors += it }
 	}
 }
 
@@ -193,16 +242,40 @@ class MutableContactInfo(
 	val additional: MutableMap<String, URI> = mutableMap(ContactCapacity)
 )
 {
-	constructor(immutable: ContactInfo) : this(
-		email    = immutable.email,
-		irc      = immutable.irc     ?.toUri(),
-		homepage = immutable.homepage?.toUri(),
-		issues   = immutable.issues  ?.toUri(),
-		discord  = immutable.discord ?.toUri(),
-		slack    = immutable.slack   ?.toUri(),
-		twitter  = immutable.twitter ?.toUri(),
-		additional = immutable.additionalIntoMutableMap()
+	private constructor(additionalCapacity: Int) : this(
+		additional = mutableMap(additionalCapacity)
 	)
+	
+	constructor(immutable: ContactInfo) : this(
+		immutable.additional sizeOr 0 + ContactCapacity
+	)
+	{
+		populateWith(immutable)
+	}
+	
+	fun populateWith(immutable: ContactInfo)
+	{
+		email    = immutable.email
+		irc      = immutable.irc     ?.toUri()
+		homepage = immutable.homepage?.toUri()
+		issues   = immutable.issues  ?.toUri()
+		sources  = immutable.sources ?.toUri()
+		
+		val additional = additional
+		
+		immutable.additional?.let()
+		{
+			for ((key, value) in it)
+				when (key)
+				{
+					"discord" -> discord = value.toUri()
+					"slack"   -> slack   = value.toUri()
+					"twitter" -> twitter = value.toUri()
+					else      ->
+						additional[key] = value.toUri()
+				}
+		}
+	}
 	
 	fun freeze() =
 		ContactInfo(
@@ -221,23 +294,6 @@ class MutableContactInfo(
 	{
 		@Suppress("NOTHING_TO_INLINE")
 		private inline fun String.toUri() = URI(this)
-		
-		internal fun ContactInfo.additionalIntoMutableMap(): MutableMap<String, URI>
-		{
-			val additional = additional ?: return mutableMap(ContactCapacity)
-			
-			val mutable = mutableMap<String, URI>(additional.size + ContactCapacity)
-			
-			for ((key, value) in additional)
-				when (key)
-				{
-					"discord", "slack", "twitter" -> { }
-					else                          ->
-						mutable[key] = URI(value)
-				}
-			
-			return mutable
-		}
 	}
 }
 
