@@ -62,7 +62,10 @@ class MutableFabricMod(
 		immutable.mixins          ?.let { mixins           += it }
 		immutable.languageAdapters?.let { languageAdapters += it }
 		
+		dependencies.populateWith(immutable)
+		metadata    .populateWith(immutable)
 		
+		immutable.accessWidener?.let { accessWidener = it.toPath() }
 	}
 	
 	inline operator fun invoke(populate: MutableFabricMod.() -> Unit) = this.populate()
