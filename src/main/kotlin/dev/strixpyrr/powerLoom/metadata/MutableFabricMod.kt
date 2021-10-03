@@ -211,10 +211,10 @@ data class MetadataContainer(
 	
 	fun populateWith(immutable: FabricMod)
 	{
-		name        = immutable.name
-		description = immutable.description
-		license     = immutable.license
-		icon        = immutable.icon
+		immutable.name       ?.let { name        = it }
+		immutable.description?.let { description = it }
+		immutable.license    ?.let { license     = it }
+		immutable.icon       ?.let { icon        = it }
 		
 		populatePeople(immutable)
 		
@@ -258,11 +258,11 @@ class MutableContactInfo(
 	
 	fun populateWith(immutable: ContactInfo)
 	{
-		email    = immutable.email
-		irc      = immutable.irc     ?.toUri()
-		homepage = immutable.homepage?.toUri()
-		issues   = immutable.issues  ?.toUri()
-		sources  = immutable.sources ?.toUri()
+		immutable.email   ?.let { email    = it         }
+		immutable.irc     ?.let { irc      = it.toUri() }
+		immutable.homepage?.let { homepage = it.toUri() }
+		immutable.issues  ?.let { issues   = it.toUri() }
+		immutable.sources ?.let { sources  = it.toUri() }
 		
 		val additional = additional
 		
