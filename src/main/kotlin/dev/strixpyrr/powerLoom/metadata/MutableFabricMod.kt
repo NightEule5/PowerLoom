@@ -11,11 +11,21 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+@file:UseSerializers(UriAsStringSerializer::class, IconSerializer::class)
+
 package dev.strixpyrr.powerLoom.metadata
 
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
+import kotlinx.serialization.descriptors.PrimitiveKind.STRING
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 import java.net.URI
 import java.nio.file.Path
 import kotlin.io.path.Path
+import java.io.Serializable as JSerializable
 
 private const val EntryPointCapacity = 4
 private const val  NestedJarCapacity = 8
@@ -25,7 +35,8 @@ private const val DependencyCapacity = 8
 private const val     PersonCapacity = 4
 private const val    ContactCapacity = 2
 
-class MutableFabricMod(
+@Serializable
+data class MutableFabricMod(
 	var id     : String = Unset,
 	var version: String = Unset,
 	var environment: Environment        = Environment.Either,
@@ -36,7 +47,7 @@ class MutableFabricMod(
 	val dependencies    : DependencyContainer        = DependencyContainer(),
 	val metadata        : MetadataContainer = MetadataContainer(),
 	var accessWidener   : Path? = null
-)
+) : JSerializable
 {
 	constructor(immutable: FabricMod) : this(
 		id      = immutable.id,
@@ -119,6 +130,10 @@ class MutableFabricMod(
 		private const val Unset = ""
 		
 		internal fun String?.toPath() = if (this == null) null else Path(this)
+		
+		// Serialization
+		
+		private const val serialVersionUID = 1L
 	}
 }
 
@@ -127,11 +142,12 @@ internal fun EntryPoints?.intoMutable() =
 		MutableEntryPoints()
 	else MutableEntryPoints(this)
 
+@Serializable
 class MutableEntryPoints(
 	val common: MutableList<EntryPoint> = mutableList(EntryPointCapacity),
 	val server: MutableList<EntryPoint> = mutableList(EntryPointCapacity),
 	val client: MutableList<EntryPoint> = mutableList(EntryPointCapacity)
-)
+) : JSerializable
 {
 	constructor(immutable: EntryPoints) : this(
 		common = mutableList(immutable.common sizeOr EntryPointCapacity),
@@ -155,15 +171,23 @@ class MutableEntryPoints(
 			server.toSet().nullIfEmpty(),
 			client.toSet().nullIfEmpty()
 		)
+	
+	companion object
+	{
+		// Serialization
+		
+		private const val serialVersionUID = 1L
+	}
 }
 
+@Serializable
 data class DependencyContainer(
 	val depends   : MutableMap<String, String> = mutableMap(DependencyCapacity),
 	val recommends: MutableMap<String, String> = mutableMap(DependencyCapacity),
 	val suggests  : MutableMap<String, String> = mutableMap(DependencyCapacity),
 	val conflicts : MutableMap<String, String> = mutableMap(DependencyCapacity),
 	val breaks    : MutableMap<String, String> = mutableMap(DependencyCapacity)
-)
+) : JSerializable
 {
 	constructor(immutable: FabricMod) : this(
 		depends    = mutableMap(immutable.depends    sizeOr DependencyCapacity),
@@ -184,8 +208,16 @@ data class DependencyContainer(
 		immutable.conflicts ?.let { conflicts  += it }
 		immutable.breaks    ?.let { breaks     += it }
 	}
+	
+	companion object
+	{
+		// Serialization
+		
+		private const val serialVersionUID = 1L
+	}
 }
 
+@Serializable
 data class MetadataContainer(
 	var name        : String? = null,
 	var description : String? = null,
@@ -194,7 +226,7 @@ data class MetadataContainer(
 	val contact     : MutableContactInfo = MutableContactInfo(),
 	var license     : String? = null,
 	var icon        : Icon?   = null,
-)
+) : JSerializable
 {
 	constructor(immutable: FabricMod) : this(
 		name         = immutable.name,
@@ -226,6 +258,13 @@ data class MetadataContainer(
 		immutable.authors     ?.let { authors      += it }
 		immutable.contributors?.let { contributors += it }
 	}
+	
+	companion object
+	{
+		// Serialization
+		
+		private const val serialVersionUID = 1L
+	}
 }
 
 internal fun ContactInfo?.intoMutable() =
@@ -233,6 +272,7 @@ internal fun ContactInfo?.intoMutable() =
 		MutableContactInfo()
 	else MutableContactInfo(this)
 
+@Serializable
 class MutableContactInfo(
 	var email   : String? = null,
 	var irc     : URI?    = null,
@@ -243,7 +283,7 @@ class MutableContactInfo(
 	var slack   : URI?    = null,
 	var twitter : URI?    = null,
 	val additional: MutableMap<String, URI> = mutableMap(ContactCapacity)
-)
+) : JSerializable
 {
 	private constructor(additionalCapacity: Int) : this(
 		additional = mutableMap(additionalCapacity)
@@ -297,9 +337,24 @@ class MutableContactInfo(
 	{
 		@Suppress("NOTHING_TO_INLINE")
 		private inline fun String.toUri() = URI(this)
+		
+		// Serialization
+		
+		private const val serialVersionUID = 1L
 	}
 }
 
 class FieldNotSetException(name: String) : Exception(
 	"The field $name is required but hasn't been set."
 )
+
+// Serialization
+
+internal object UriAsStringSerializer : KSerializer<URI>
+{
+	override val descriptor = PrimitiveSerialDescriptor("URI", STRING)
+	
+	override fun deserialize(decoder: Decoder) = URI(decoder.decodeString())
+	
+	override fun serialize(encoder: Encoder, value: URI) = encoder.encodeString("$value")
+}
