@@ -21,7 +21,9 @@ repositories()
 dependencies()
 {
 	implementation(kotlin("stdlib"))
+	implementation(kotlin("gradle-plugin"))
 	implementation(gradleApi())
+	implementation(gradleKotlinDsl())
 	
 	implementation(deps.okio)
 	implementation(deps.kotlinx.serialization.json)
