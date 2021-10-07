@@ -76,14 +76,6 @@ object FabricModMetadataTest : StringSpec()
 			value.contact shouldBe testContactInfo
 		}
 	}
-	
-	private const val TestModId      = "test"
-	private const val TestModVersion = "4.2.0"
-	private const val TestIssuesLink = "https://test.mod/issues"
-	private const val TestDiscord    = "https://discord.gg/testmod"
-	
-	private const val InvalidTestModId = "-test"
-	
 	@JvmStatic
 	private val testContactInfo = ContactInfo(
 		issues = URI(TestIssuesLink),
