@@ -29,6 +29,7 @@ dependencies()
 	implementation(deps.kotlinx.serialization.json)
 	
 	testImplementation(deps.kotest)
+	testImplementation(gradleTestKit())
 }
 
 kotlin()
