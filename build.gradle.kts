@@ -60,6 +60,12 @@ tasks()
 	{
 		useJUnitPlatform()
 	}
+	
+	val testClasses by getting()
+	{
+		// Why tf is this not done by default? O_o
+		dependsOn("pluginUnderTestMetadata")
+	}
 }
 
 gradlePlugin()
