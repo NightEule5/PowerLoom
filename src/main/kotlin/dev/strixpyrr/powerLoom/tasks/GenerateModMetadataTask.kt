@@ -29,10 +29,57 @@ import java.nio.file.StandardOpenOption.TRUNCATE_EXISTING
 import javax.inject.Inject
 import kotlin.io.path.div
 
-open class GenerateModMetadataTask : DefaultTask
+open class GenerateModMetadataTask @Inject constructor() : DefaultTask()
 {
-	@Inject
-	internal constructor(sourceSet: KotlinSourceSet) : super()
+	init
+	{
+		group = TaskGroup
+	}
+	
+	/**
+	 * A [MutableFabricMod] instance containing data to be serialized to a file at
+	 * the [outputFile] path. If this is set to null, the task will do nothing.
+	 * For instances created by the plugin, this will be set to `mod.metadata` by
+	 * default.
+	 */
+	@get:Input
+	var modMetadata: MutableFabricMod? = null
+	
+	/**
+	 * The path to a file that replaces values from [modMetadata]. This property is
+	 * optional.
+	 */
+	@get:InputFile
+	var replacementFile: Path? = null
+	
+	private var _outputDirectory: Path? = null
+	
+	/**
+	 * The output directory path. This property is required for task instances not
+	 * registered by the plugin itself.
+	 */
+	@get:OutputDirectory
+	var outputDirectory: Path
+		get() = when (val value = _outputDirectory)
+		{
+			null -> throw Exception("No output directory was set.")
+			else -> value
+		}
+		set(value)
+		{
+			_outputDirectory = if (value.isAbsolute)
+				value
+			else project.projectDir.toPath() / value
+		}
+	
+	/**
+	 * The path to the output `fabric.mod.json` file, with [outputDirectory] as its
+	 * base.
+	 */
+	@get:OutputFile
+	val outputFile get() = outputDirectory / FabricModJson
+	
+	internal fun fromSourceSet(sourceSet: KotlinSourceSet)
 	{
 		val name = sourceSet.name
 		
@@ -73,7 +120,7 @@ open class GenerateModMetadataTask : DefaultTask
 		// Output directory
 		
 		var outputDir  = project.buildDir.toPath()
-			outputDir /= "generated-resources/power-loom-$name/"
+		outputDir /= "generated-resources/power-loom-$name/"
 		
 		_outputDirectory = outputDir
 		
@@ -90,63 +137,6 @@ open class GenerateModMetadataTask : DefaultTask
 			srcDir(this@GenerateModMetadataTask)
 		}
 	}
-	
-	@Inject // This constructor will be called when the user creates the task with
-			// the "registering" and "creating" DSL.
-	internal constructor() : super()
-	{
-		modMetadata      = null
-		replacementFile  = null
-		_outputDirectory = null
-	}
-	
-	init
-	{
-		group = TaskGroup
-	}
-	
-	/**
-	 * A [MutableFabricMod] instance containing data to be serialized to a file at
-	 * the [outputFile] path. If this is set to null, the task will do nothing.
-	 * For instances created by the plugin, this will be set to `mod.metadata` by
-	 * default.
-	 */
-	@get:Input
-	var modMetadata: MutableFabricMod?
-	
-	/**
-	 * The path to a file that replaces values from [modMetadata]. This property is
-	 * optional.
-	 */
-	@get:InputFile
-	var replacementFile: Path?
-	
-	private var _outputDirectory: Path? = null
-	
-	/**
-	 * The output directory path. This property is required for task instances not
-	 * registered by the plugin itself.
-	 */
-	@get:OutputDirectory
-	var outputDirectory: Path
-		get() = when (val value = _outputDirectory)
-		{
-			null -> throw Exception("No output directory was set.")
-			else -> value
-		}
-		set(value)
-		{
-			_outputDirectory = if (value.isAbsolute)
-				value
-			else project.projectDir.toPath() / value
-		}
-	
-	/**
-	 * The path to the output `fabric.mod.json` file, with [outputDirectory] as its
-	 * base.
-	 */
-	@get:OutputFile
-	val outputFile get() = outputDirectory / FabricModJson
 	
 	@TaskAction
 	internal fun generate()

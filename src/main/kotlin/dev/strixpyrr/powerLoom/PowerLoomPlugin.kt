@@ -48,7 +48,8 @@ class PowerLoomPlugin : Plugin<Project>
 					// set a dependency in resources. The alternative would be to
 					// find the processResources task for the current source set,
 					// but KotlinSourceSet doesn't provide that information.
-					create<GenerateModMetadataTask>(it.toGenerateModMetadataName(), it)
+					create<GenerateModMetadataTask>(it.toGenerateModMetadataName())
+						.fromSourceSet(it)
 				}
 			}
 		}
