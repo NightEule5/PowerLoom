@@ -43,6 +43,7 @@ open class GenerateModMetadataTask @Inject constructor() : DefaultTask()
 	 * default.
 	 */
 	@get:Input
+	@get:Optional
 	var modMetadata: MutableFabricMod? = null
 	
 	/**
@@ -50,6 +51,7 @@ open class GenerateModMetadataTask @Inject constructor() : DefaultTask()
 	 * optional.
 	 */
 	@get:InputFile
+	@get:Optional
 	var replacementFile: Path? = null
 	
 	private var _outputDirectory: Path? = null
