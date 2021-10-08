@@ -25,12 +25,16 @@ object MetadataGenerationTest : StringSpec()
 	{
 		"Generates bare-minimum fabric.mod.json"()
 		{
-			val gradle = Gradle.createGradle(Path("metadata/bareMin"))
+			val gradle =
+				Gradle.createGradle(
+					projectPath = Path("metadata/bareMin"),
+					arguments   = listOf("generateModMetadata")
+				)
 			
 			gradle.intoBuild    { genBareMinimumScript() }
 			gradle.intoSettings {  }
 			
-			gradle.run().task("generateModMetadata")?.outcome shouldBe SUCCESS
+			gradle.run().task(":generateModMetadata")?.outcome shouldBe SUCCESS
 		}
 	}
 	
