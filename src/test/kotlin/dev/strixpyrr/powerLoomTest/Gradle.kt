@@ -36,13 +36,13 @@ internal object Gradle
 	) = GradleBuild(rootPath / projectPath, arguments)
 	
 	@JvmStatic
-	internal fun openScript(root: Path, name: String) =
+	internal fun openFile(root: Path, name: String) =
 		(root / name).createParents().sink(CREATE, TRUNCATE_EXISTING).buffer()
 	
 	@JvmStatic
 	private fun Path.createParents() = apply { parent.createDirectories() }
 	
-	private val rootPath = Path("run")
+	@JvmStatic private val rootPath = Path("run")
 	
 	private const val CurrentVersion = "7.2"
 	
@@ -62,7 +62,7 @@ internal object Gradle
 		)
 		
 		fun openBuild() =
-			openScript(
+			openFile(
 				root = projectDir,
 				name = "build.gradle.kts"
 			)
@@ -70,11 +70,27 @@ internal object Gradle
 		inline fun intoBuild(block: BufferedSink.() -> Unit) = openBuild().use(block)
 		
 		fun openSettings() =
-			openScript(
+			openFile(
 				root = projectDir,
 				name = "settings.gradle.kts"
 			)
 		
 		inline fun intoSettings(block: BufferedSink.() -> Unit) = openSettings().use(block)
+		
+		fun openResourceAt(name: String) =
+			openFile(
+				root = projectDir / resPath,
+				name
+			)
+		
+		inline fun intoResourceAt(
+			name: String,
+			block: BufferedSink.() -> Unit
+		) = openResourceAt(name).use(block)
+		
+		companion object
+		{
+			@JvmStatic private val resPath = Path("src/main/resources")
+		}
 	}
 }
