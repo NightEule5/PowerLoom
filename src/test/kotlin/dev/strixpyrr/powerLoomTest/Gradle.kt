@@ -30,7 +30,10 @@ import kotlin.io.path.div
 internal object Gradle
 {
 	@JvmStatic
-	fun createGradle(projectPath: Path) = GradleBuild(rootPath / projectPath)
+	fun createGradle(
+		projectPath: Path,
+		arguments: List<String> = emptyList()
+	) = GradleBuild(rootPath / projectPath, arguments)
 	
 	@JvmStatic
 	internal fun openScript(root: Path, name: String) =
@@ -50,10 +53,11 @@ internal object Gradle
 	{
 		fun run(): BuildResult = gr.build()
 		
-		constructor(projectDir: Path) : this(
+		constructor(projectDir: Path, arguments: List<String>) : this(
 			create().withGradleVersion(CurrentVersion)
 					.withProjectDir(projectDir.toFile())
-					.withPluginClasspath(),
+					.withPluginClasspath()
+					.withArguments(arguments),
 			projectDir
 		)
 		
