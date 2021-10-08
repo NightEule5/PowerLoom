@@ -5,7 +5,7 @@ quality-of-life improving features for Fabric mod development. It can generate a
 modify `fabric.mod.json` files, download other mods into your dev environment for
 testing, and setup publishing to both CurseForge and Modrinth simultaneously.
 
-**This project is not finished. See the [Planned Features](#Planned Features) list
+**This project is not finished. See the [Planned Features](#planned-features) list
 for implemented vs planned features.**
 
 ## Testing
