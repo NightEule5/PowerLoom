@@ -15,6 +15,9 @@ package dev.strixpyrr.powerLoomTest
 
 import dev.strixpyrr.powerLoom.metadata.ContactInfo
 import dev.strixpyrr.powerLoom.metadata.FabricMod
+import dev.strixpyrr.powerLoomTest.FabricModMetadataTest.BlankJson
+import dev.strixpyrr.powerLoomTest.FabricModMetadataTest.ContactJson
+import dev.strixpyrr.powerLoomTest.FabricModMetadataTest.testContactInfo
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
@@ -22,62 +25,61 @@ import okio.Buffer
 import java.net.URI
 
 @Suppress("BlockingMethodInNonBlockingContext")
-object FabricModMetadataTest : StringSpec()
+object FabricModMetadataTest : StringSpec(
 {
-	init
+	"Rejects invalid Id"()
 	{
-		"Rejects invalid Id"()
+		shouldThrow<IllegalArgumentException>
 		{
-			shouldThrow<IllegalArgumentException>
-			{
-				FabricMod(
-					id      = InvalidTestModId,
-					version = TestModVersion
-				)
-			}
-		}
-		
-		// Tests omission of empty collections.
-		"Generates bare-minimum fabric.mod.json"()
-		{
-			val buffer = Buffer()
-			
 			FabricMod(
-				id      = TestModId,
+				id      = InvalidTestModId,
 				version = TestModVersion
-			).encode(buffer)
-			
-			buffer.readUtf8() shouldBe BlankJson
-		}
-		
-		"Generates additional contact info correctly"()
-		{
-			val buffer = Buffer()
-			
-			FabricMod(
-				id      = TestModId,
-				version = TestModVersion,
-				contact = testContactInfo
-			).encode(buffer)
-			
-			buffer.readUtf8() shouldBe ContactJson
-		}
-		
-		"Parses additional contact info correctly"()
-		{
-			val buffer = Buffer()
-			
-			buffer.writeUtf8(ContactJson)
-			
-			val value = FabricMod.decode(buffer)
-			
-			value.id      shouldBe TestModId
-			value.version shouldBe TestModVersion
-			value.contact shouldBe testContactInfo
+			)
 		}
 	}
-	@JvmStatic
-	private val testContactInfo = ContactInfo(
+	
+	// Tests omission of empty collections.
+	"Generates bare-minimum fabric.mod.json"()
+	{
+		val buffer = Buffer()
+		
+		FabricMod(
+			id      = TestModId,
+			version = TestModVersion
+		).encode(buffer)
+		
+		buffer.readUtf8() shouldBe BlankJson
+	}
+	
+	"Generates additional contact info correctly"()
+	{
+		val buffer = Buffer()
+		
+		FabricMod(
+			id      = TestModId,
+			version = TestModVersion,
+			contact = testContactInfo
+		).encode(buffer)
+		
+		buffer.readUtf8() shouldBe ContactJson
+	}
+	
+	"Parses additional contact info correctly"()
+	{
+		val buffer = Buffer()
+		
+		buffer.writeUtf8(ContactJson)
+		
+		val value = FabricMod.decode(buffer)
+		
+		value.id      shouldBe TestModId
+		value.version shouldBe TestModVersion
+		value.contact shouldBe testContactInfo
+	}
+})
+{
+	@JvmField
+	internal val testContactInfo = ContactInfo(
 		issues = URI(TestIssuesLink),
 		discord = URI(TestDiscord)
 	)

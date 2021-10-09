@@ -13,37 +13,65 @@
 // limitations under the License.
 package dev.strixpyrr.powerLoomTest
 
+import dev.strixpyrr.powerLoomTest.MetadataGenerationTest.genBareMinimumScript
+import dev.strixpyrr.powerLoomTest.MetadataGenerationTest.genBlankScript
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import okio.BufferedSink
 import org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import kotlin.io.path.Path
 
-object MetadataGenerationTest : StringSpec()
+object MetadataGenerationTest : StringSpec(
 {
-	init
+	"Generates bare-minimum fabric.mod.json"()
 	{
-		"Generates bare-minimum fabric.mod.json"()
-		{
-			val gradle =
-				Gradle.createGradle(
-					projectPath = Path("metadata/bareMin"),
-					arguments   = listOf("generateModMetadata")
-				)
-			
-			gradle.intoBuild    { genBareMinimumScript() }
-			gradle.intoSettings {  }
-			
-			gradle.run().task(":generateModMetadata")?.outcome shouldBe SUCCESS
-		}
+		val gradle =
+			Gradle.createGradle(
+				projectPath = Path("metadata/bareMin"),
+				arguments   = listOf("generateModMetadata")
+			)
+		
+		gradle.intoBuild    { genBareMinimumScript() }
+		gradle.intoSettings {  }
+		
+		gradle.run().task(":generateModMetadata")?.outcome shouldBe SUCCESS
 	}
 	
+	"Generates bare-minimum fabric.mod.json using replacement file"()
+	{
+		val gradle =
+			Gradle.createGradle(
+				projectPath = Path("metadata/bareMinReplFile"),
+				arguments   = listOf("generateModMetadata")
+			)
+		
+		gradle.intoBuild    { genBlankScript() }
+		gradle.intoSettings {  }
+		
+		gradle.intoResourceAt("fabric.mod.json")
+		{
+			writeUtf8(
+				// language=json
+				"""{"id":"$TestModId","version":"$TestModVersion"}"""
+			)
+		}
+		
+		gradle.run().task(":generateModMetadata")?.outcome shouldBe SUCCESS
+	}
+})
+{
 	@JvmStatic
-	internal fun BufferedSink.genBareMinimumScript()
+	fun BufferedSink.genBareMinimumScript()
 	{
 		// Huh, apparently trimIndent interprets at compile-time for constants. It
 		// has apparently been this way since 1.3.40, but I never realized it. Pog
 		writeUtf8("$ScriptPrefix$ScriptRequiredFields$ScriptSuffix".trimIndent())
+	}
+	
+	@JvmStatic
+	fun BufferedSink.genBlankScript()
+	{
+		writeUtf8("$ScriptPrefix$ScriptSuffix".trimIndent())
 	}
 	
 	// language=kts
