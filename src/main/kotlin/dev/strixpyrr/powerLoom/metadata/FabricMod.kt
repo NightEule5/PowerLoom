@@ -17,6 +17,7 @@
 package dev.strixpyrr.powerLoom.metadata
 
 import kotlinx.serialization.*
+import kotlinx.serialization.EncodeDefault.Mode.ALWAYS
 import kotlinx.serialization.json.*
 import okio.BufferedSink
 import okio.BufferedSource
@@ -29,7 +30,8 @@ import java.nio.file.Path
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable
 data class FabricMod internal constructor(
-	val schemaVersion   : Int,
+	@EncodeDefault(mode = ALWAYS)
+	val schemaVersion   : Int = 1,
 	val id              : String,
 	val version         : String,
 	val environment     : Environment = Environment.Either,
