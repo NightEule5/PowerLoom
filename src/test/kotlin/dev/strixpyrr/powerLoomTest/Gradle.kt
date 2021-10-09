@@ -57,7 +57,8 @@ internal object Gradle
 			create().withGradleVersion(CurrentVersion)
 					.withProjectDir(projectDir.toFile())
 					.withPluginClasspath()
-					.withArguments(arguments),
+					.withArguments(arguments)
+					.forwardOutput(),
 			projectDir
 		)
 		
