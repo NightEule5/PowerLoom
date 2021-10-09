@@ -28,6 +28,7 @@ import java.nio.file.StandardOpenOption.CREATE
 import java.nio.file.StandardOpenOption.TRUNCATE_EXISTING
 import javax.inject.Inject
 import kotlin.io.path.div
+import kotlin.io.path.exists
 
 open class GenerateModMetadataTask @Inject constructor() : DefaultTask()
 {
@@ -93,28 +94,35 @@ open class GenerateModMetadataTask @Inject constructor() : DefaultTask()
 		
 		// Replacement file
 		
-		val resourceDirs = sourceSet.resources.sourceDirectories
+		val resourceDirs = sourceSet.resources
+									.sourceDirectories
+									.elements.get()
 		
-		val jsonFiles = resourceDirs.files.filter { it.name == FabricModJson }
+		var rf: Path? = null
 		
-		val rf = when
+		for (dir in resourceDirs)
 		{
-			jsonFiles.isEmpty() -> null
-			jsonFiles.size == 1 -> jsonFiles[0].toPath()
-			else                ->
-			{
-				logger.warn(
-					"The replacement file path could not be set from the $name " +
-					"source set: multiple $FabricModJson files were found in the" +
-					" resource directories:"
-				)
-				
-				jsonFiles.forEach { logger.warn("\t$it") }
-				
-				logger.warn("The replacementFile property will be set to null.")
-				
-				null
-			}
+			val dirPath = dir.asFile.toPath()
+			
+			val candidate = dirPath / FabricModJson
+			
+			if (candidate.exists())
+				if (rf == null)
+					rf = candidate
+				else logger.run()
+				{
+					warn(
+						"""
+						The replacement file path could not be set from the $name\
+						source set: multiple $FabricModJson files were found in the\
+						resource directories:
+							at $rf
+							at $candidate
+						The replacementFile property will be set to the first of\
+						these.
+						""".trimIndent().replace("\\\n", " ")
+					)
+				}
 		}
 		
 		replacementFile = rf
