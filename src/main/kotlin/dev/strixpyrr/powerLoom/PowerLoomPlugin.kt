@@ -13,7 +13,9 @@
 // limitations under the License.
 package dev.strixpyrr.powerLoom
 
+import dev.strixpyrr.powerLoom.internal.Property.CreateDefaultTasks
 import dev.strixpyrr.powerLoom.internal.get
+import dev.strixpyrr.powerLoom.internal.properties
 import dev.strixpyrr.powerLoom.tasks.GenerateModMetadataTask
 import dev.strixpyrr.powerLoom.tasks.toGenerateModMetadataName
 import org.gradle.api.Plugin
@@ -32,24 +34,30 @@ class PowerLoomPlugin : Plugin<Project>
 				throw Exception("The Kotlin plugin is not applied.")
 		}
 		
+		val props = target.properties()
+		
 		target.extensions.add(ModExtension::class.java, ModExtension.Name, ModExtension())
 		
-		val kotlin: KotlinProjectExtension = target.extensions["kotlin"]
-		
-		val sourceSets = kotlin.sourceSets
-		
-		target.tasks.run()
+		if (props[CreateDefaultTasks])
 		{
-			sourceSets.forEach()
+			val kotlin: KotlinProjectExtension = target.extensions["kotlin"]
+			
+			val sourceSets = kotlin.sourceSets
+			
+			target.tasks.run()
 			{
-				if (it.name.contains("main", ignoreCase = true))
+				sourceSets.forEach()
 				{
-					// Register would be ideal, but the task has to be created to
-					// set a dependency in resources. The alternative would be to
-					// find the processResources task for the current source set,
-					// but KotlinSourceSet doesn't provide that information.
-					create<GenerateModMetadataTask>(it.toGenerateModMetadataName())
-						.fromSourceSet(it)
+					if (it.name.contains("main", ignoreCase = true))
+					{
+						// Register would be ideal, but the task has to be created
+						// to set a dependency in resources. The alternative would
+						// be to find the processResources task for the current
+						// source set, but KotlinSourceSet doesn't provide that
+						// information.
+						create<GenerateModMetadataTask>(it.toGenerateModMetadataName())
+							.fromSourceSet(it)
+					}
 				}
 			}
 		}
