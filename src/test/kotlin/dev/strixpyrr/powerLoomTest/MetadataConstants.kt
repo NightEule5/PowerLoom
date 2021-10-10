@@ -13,9 +13,23 @@
 // limitations under the License.
 package dev.strixpyrr.powerLoomTest
 
+internal const val FabricModJson = "fabric.mod.json"
+
 internal const val TestModId      = "test"
 internal const val TestModVersion = "4.2.0"
 internal const val TestIssuesLink = "https://test.mod/issues"
 internal const val TestDiscord    = "https://discord.gg/testmod"
 
 internal const val InvalidTestModId = "-test"
+
+private const val      SvJsonField = """"schemaVersion":1"""
+private const val      IdJsonField = """"id":"$TestModId""""
+private const val VersionJsonField = """"version":"$TestModVersion""""
+private const val ContactJsonField = """"contact":{"issues":"$TestIssuesLink","discord":"$TestDiscord"}"""
+
+private const val BaseJsonFragment       = "$IdJsonField,$VersionJsonField"
+private const val BaseJsonFragmentWithSv = "$SvJsonField,$BaseJsonFragment"
+
+internal const val BaseJson       = "{${BaseJsonFragment      }}"
+internal const val BaseJsonWithSv = "{${BaseJsonFragmentWithSv}}"
+internal const val ContactJson    = "{${BaseJsonFragmentWithSv},$ContactJsonField}"

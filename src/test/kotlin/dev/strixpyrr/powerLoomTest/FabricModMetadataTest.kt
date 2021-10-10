@@ -15,14 +15,11 @@ package dev.strixpyrr.powerLoomTest
 
 import dev.strixpyrr.powerLoom.metadata.ContactInfo
 import dev.strixpyrr.powerLoom.metadata.FabricMod
-import dev.strixpyrr.powerLoomTest.FabricModMetadataTest.BlankJson
-import dev.strixpyrr.powerLoomTest.FabricModMetadataTest.ContactJson
 import dev.strixpyrr.powerLoomTest.FabricModMetadataTest.testContactInfo
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import okio.Buffer
-import java.net.URI
 
 @Suppress("BlockingMethodInNonBlockingContext")
 object FabricModMetadataTest : StringSpec(
@@ -48,7 +45,7 @@ object FabricModMetadataTest : StringSpec(
 			version = TestModVersion
 		).encode(buffer)
 		
-		buffer.readUtf8() shouldBe BlankJson
+		buffer.readUtf8() shouldBe BaseJsonWithSv
 	}
 	
 	"Generates additional contact info correctly"()
@@ -80,15 +77,7 @@ object FabricModMetadataTest : StringSpec(
 {
 	@JvmField
 	internal val testContactInfo = ContactInfo(
-		issues = URI(TestIssuesLink),
-		discord = URI(TestDiscord)
+		issues = TestIssuesLink,
+		additional = mapOf("discord" to TestDiscord)
 	)
-	
-	private const val BaseJsonFragment =
-		""""schemaVersion":1,"id":"$TestModId","version":"$TestModVersion""""
-	
-	private const val BlankJson = "{$BaseJsonFragment}"
-	
-	private const val ContactJson =
-		"""{$BaseJsonFragment,"contact":{"issues":"$TestIssuesLink","discord":"$TestDiscord"}}"""
 }

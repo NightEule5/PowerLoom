@@ -32,8 +32,9 @@ internal object Gradle
 	@JvmStatic
 	fun createGradle(
 		projectPath: Path,
+		targetTask: String,
 		arguments: List<String> = emptyList()
-	) = GradleBuild(rootPath / projectPath, arguments)
+	) = GradleBuild(rootPath / projectPath, targetTask, arguments)
 	
 	@JvmStatic
 	internal fun openFile(root: Path, name: String) =
@@ -41,6 +42,9 @@ internal object Gradle
 	
 	@JvmStatic
 	private fun Path.createParents() = apply { parent.createDirectories() }
+	
+	@JvmStatic
+	infix fun BuildResult.outcomeOf(path: String) = task(path)?.outcome
 	
 	@JvmStatic private val rootPath = Path("run")
 	
@@ -53,11 +57,13 @@ internal object Gradle
 	{
 		fun run(): BuildResult = gr.build()
 		
-		constructor(projectDir: Path, arguments: List<String>) : this(
+		constructor(projectDir: Path, task: String, arguments: List<String>) : this(
 			create().withGradleVersion(CurrentVersion)
 					.withProjectDir(projectDir.toFile())
 					.withPluginClasspath()
-					.withArguments(arguments)
+					.withArguments(
+						listOf(task) + arguments
+					)
 					.forwardOutput(),
 			projectDir
 		)

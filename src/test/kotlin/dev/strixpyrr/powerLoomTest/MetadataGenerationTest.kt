@@ -13,6 +13,7 @@
 // limitations under the License.
 package dev.strixpyrr.powerLoomTest
 
+import dev.strixpyrr.powerLoomTest.Gradle.outcomeOf
 import dev.strixpyrr.powerLoomTest.MetadataGenerationTest.genBareMinimumScript
 import dev.strixpyrr.powerLoomTest.MetadataGenerationTest.genBlankScript
 import io.kotest.core.spec.style.StringSpec
@@ -28,13 +29,13 @@ object MetadataGenerationTest : StringSpec(
 		val gradle =
 			Gradle.createGradle(
 				projectPath = Path("metadata/bareMin"),
-				arguments   = listOf("generateModMetadata")
+				targetTask  = GenerateModMetadataName
 			)
 		
 		gradle.intoBuild    { genBareMinimumScript() }
 		gradle.intoSettings {  }
 		
-		gradle.run().task(":generateModMetadata")?.outcome shouldBe SUCCESS
+		gradle.run() outcomeOf GenerateModMetadataPath shouldBe SUCCESS
 	}
 	
 	"Generates bare-minimum fabric.mod.json using replacement file"()
@@ -42,21 +43,18 @@ object MetadataGenerationTest : StringSpec(
 		val gradle =
 			Gradle.createGradle(
 				projectPath = Path("metadata/bareMinReplFile"),
-				arguments   = listOf("generateModMetadata")
+				targetTask  = GenerateModMetadataName
 			)
 		
 		gradle.intoBuild    { genBlankScript() }
 		gradle.intoSettings {  }
 		
-		gradle.intoResourceAt("fabric.mod.json")
+		gradle.intoResourceAt(FabricModJson)
 		{
-			writeUtf8(
-				// language=json
-				"""{"id":"$TestModId","version":"$TestModVersion"}"""
-			)
+			writeUtf8(BaseJson)
 		}
 		
-		gradle.run().task(":generateModMetadata")?.outcome shouldBe SUCCESS
+		gradle.run() outcomeOf GenerateModMetadataPath shouldBe SUCCESS
 	}
 	
 	"Hooks into processResources"()
@@ -64,13 +62,13 @@ object MetadataGenerationTest : StringSpec(
 		val gradle =
 			Gradle.createGradle(
 				projectPath = Path("metadata/procResHook"),
-				arguments   = listOf("processResources")
+				targetTask  = ProcessResourcesName
 			)
 		
 		gradle.intoBuild    { genBareMinimumScript() }
 		gradle.intoSettings {  }
 		
-		gradle.run().task(":generateModMetadata")?.outcome shouldBe SUCCESS
+		gradle.run() outcomeOf GenerateModMetadataPath shouldBe SUCCESS
 	}
 })
 {
