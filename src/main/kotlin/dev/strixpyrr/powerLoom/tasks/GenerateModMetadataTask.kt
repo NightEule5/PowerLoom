@@ -14,6 +14,7 @@
 package dev.strixpyrr.powerLoom.tasks
 
 import dev.strixpyrr.powerLoom.ModExtension
+import dev.strixpyrr.powerLoom.internal.get
 import dev.strixpyrr.powerLoom.metadata.FabricMod
 import dev.strixpyrr.powerLoom.metadata.MutableFabricMod
 import okio.buffer
@@ -22,6 +23,7 @@ import okio.source
 import okio.use
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.*
+import org.gradle.kotlin.dsl.named
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption.CREATE
@@ -136,15 +138,44 @@ open class GenerateModMetadataTask @Inject constructor() : DefaultTask()
 		
 		// Execution hook
 		
-		// This will mark the output directory as a source directory, and
-		sourceSet.resources.run()
-		{
+		// This will mark the output directory as a source directory, and execute
+		// this tasks before its output is copied.
+		//sourceSet.resources.run()
+		//{
 			// Exclude the replacement file from the output.
-			if (rf != null) exclude("$rf")
+			//if (rf != null) exclude("$rf")
 			
 			// Add our task's output as a source directory. This will also run our
 			// task before its output directory contents are copied.
-			srcDir(this@GenerateModMetadataTask)
+			// srcDir(this@GenerateModMetadataTask)
+		//}
+		
+		// Since adding the task as a source directory doesn't work, we'll have to
+		// find the source set's processResources task somehow.
+		
+		val nativeSourceSets: SourceSetContainer = project.extensions["sourceSets"]
+		
+		val nativeSourceSet = nativeSourceSets.findByName(name)
+		
+		val processResourcesName = if (nativeSourceSet == null)
+			if (name == "main")
+				"processResources"
+			else "process${name[0].lowercase()}${name.substring(1).lowercase()}Resources"
+		else
+			nativeSourceSet.processResourcesTaskName
+		
+		project.tasks.named<Copy>(processResourcesName)
+		{
+			dependsOn(this@GenerateModMetadataTask)
+			
+			// Exclude the replacement file from the output.
+			
+			val replacementFile = replacementFile
+			
+			if (replacementFile != null) exclude("$replacementFile")
+			
+			// Include our task's output directory.
+			from(outputDirectory)
 		}
 	}
 	
