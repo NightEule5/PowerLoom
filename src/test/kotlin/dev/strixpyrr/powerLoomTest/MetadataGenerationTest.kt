@@ -58,6 +58,20 @@ object MetadataGenerationTest : StringSpec(
 		
 		gradle.run().task(":generateModMetadata")?.outcome shouldBe SUCCESS
 	}
+	
+	"Hooks into processResources"()
+	{
+		val gradle =
+			Gradle.createGradle(
+				projectPath = Path("metadata/procResHook"),
+				arguments   = listOf("processResources")
+			)
+		
+		gradle.intoBuild    { genBareMinimumScript() }
+		gradle.intoSettings {  }
+		
+		gradle.run().task(":generateModMetadata")?.outcome shouldBe SUCCESS
+	}
 })
 {
 	@JvmStatic
