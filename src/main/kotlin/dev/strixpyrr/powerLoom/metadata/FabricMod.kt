@@ -114,8 +114,8 @@ data class FabricMod internal constructor(
 		// Language = Regex
 		private const val IdRegexPattern = "^[a-z][a-z0-9-_]{1,63}$"
 		
-		@JvmStatic
-		private val IdRegex = Regex(IdRegexPattern)
+		@JvmField
+		internal val IdRegex = Regex(IdRegexPattern)
 		
 		private const val ModIdInvalid =
 			"The mod identifier is invalid. It must be consist of at least one " +
