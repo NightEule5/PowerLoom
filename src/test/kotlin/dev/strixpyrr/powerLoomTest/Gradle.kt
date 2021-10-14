@@ -95,6 +95,14 @@ internal object Gradle
 			block: BufferedSink.() -> Unit
 		) = openResourceAt(name).use(block)
 		
+		fun openProperties() =
+			openFile(
+				root = projectDir,
+				name = "gradle.properties"
+			)
+		
+		inline fun intoProperties(block: BufferedSink.() -> Unit) = openProperties().use(block)
+		
 		companion object
 		{
 			@JvmStatic private val resPath = Path("src/main/resources")

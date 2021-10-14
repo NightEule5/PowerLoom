@@ -14,13 +14,15 @@
 package dev.strixpyrr.powerLoom.internal
 
 import dev.strixpyrr.powerLoom.internal.Property.CreateDefaultTasks
+import dev.strixpyrr.powerLoom.internal.Property.PullMetadataFromProject
 import org.gradle.api.Project
 
 private const val PropertyDomain = "powerLoom"
 
-private const val CreateDefaultTasksProperty = "$PropertyDomain.createDefaultTasks"
+private const val      CreateDefaultTasksProperty = "$PropertyDomain.createDefaultTasks"
+private const val PullMetadataFromProjectProperty = "$PropertyDomain.pullMetadataFromProject"
 
-internal enum class Property { CreateDefaultTasks }
+internal enum class Property { CreateDefaultTasks, PullMetadataFromProject }
 
 @Suppress("NOTHING_TO_INLINE")
 internal inline fun Project.properties() = PropertyContainer(properties)
@@ -30,7 +32,8 @@ internal value class PropertyContainer(private val map: Map<String, Any?>)
 {
 	operator fun get(property: Property) = when (property)
 	{
-		CreateDefaultTasks -> get(CreateDefaultTasksProperty, default = true)
+		CreateDefaultTasks      -> get(     CreateDefaultTasksProperty, default = true)
+		PullMetadataFromProject -> get(PullMetadataFromProjectProperty, default = true)
 	}
 	
 	private fun get(property: String, default: Boolean) =

@@ -14,6 +14,7 @@
 package dev.strixpyrr.powerLoom
 
 import dev.strixpyrr.powerLoom.internal.Property.CreateDefaultTasks
+import dev.strixpyrr.powerLoom.internal.Property.PullMetadataFromProject
 import dev.strixpyrr.powerLoom.internal.get
 import dev.strixpyrr.powerLoom.internal.properties
 import dev.strixpyrr.powerLoom.tasks.GenerateModMetadataTask
@@ -36,7 +37,9 @@ class PowerLoomPlugin : Plugin<Project>
 		
 		val props = target.properties()
 		
-		target.extensions.add(ModExtension::class.java, ModExtension.Name, ModExtension())
+		val mod = ModExtension()
+		
+		target.extensions.add(ModExtension::class.java, ModExtension.Name, mod)
 		
 		if (props[CreateDefaultTasks])
 		{
@@ -61,5 +64,8 @@ class PowerLoomPlugin : Plugin<Project>
 				}
 			}
 		}
+		
+		if (props[PullMetadataFromProject])
+			target.afterEvaluate(mod::populateFrom)
 	}
 }

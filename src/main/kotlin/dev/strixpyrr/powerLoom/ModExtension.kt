@@ -13,11 +13,26 @@
 // limitations under the License.
 package dev.strixpyrr.powerLoom
 
+import dev.strixpyrr.powerLoom.internal.toModId
 import dev.strixpyrr.powerLoom.metadata.MutableFabricMod
+import org.gradle.api.Project
 
 class ModExtension internal constructor()
 {
 	var metadata = MutableFabricMod()
+	
+	internal fun populateFrom(project: Project) = metadata()
+	{
+		id      = project.name.toModId()
+		version = "${project.version}"
+		
+		metadata.run()
+		{
+			name = project.name
+			
+			project.description?.let { description = it }
+		}
+	}
 	
 	companion object
 	{

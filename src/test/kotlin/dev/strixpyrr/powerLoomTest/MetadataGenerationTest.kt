@@ -11,14 +11,20 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+@file:Suppress("BlockingMethodInNonBlockingContext")
+
 package dev.strixpyrr.powerLoomTest
 
 import dev.strixpyrr.powerLoomTest.Gradle.outcomeOf
 import dev.strixpyrr.powerLoomTest.MetadataGenerationTest.genBareMinimumScript
 import dev.strixpyrr.powerLoomTest.MetadataGenerationTest.genBlankScript
+import dev.strixpyrr.powerLoomTest.MetadataGenerationTest.genProperties
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import okio.BufferedSink
+import okio.BufferedSource
+import okio.buffer
+import okio.source
 import org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import kotlin.io.path.Path
 
@@ -32,8 +38,9 @@ object MetadataGenerationTest : StringSpec(
 				targetTask  = GenerateModMetadataName
 			)
 		
-		gradle.intoBuild    { genBareMinimumScript() }
-		gradle.intoSettings {  }
+		gradle.intoBuild      { genBareMinimumScript() }
+		gradle.intoSettings   {  }
+		gradle.intoProperties { genProperties() }
 		
 		gradle.run() outcomeOf GenerateModMetadataPath shouldBe SUCCESS
 	}
@@ -46,8 +53,9 @@ object MetadataGenerationTest : StringSpec(
 				targetTask  = GenerateModMetadataName
 			)
 		
-		gradle.intoBuild    { genBlankScript() }
-		gradle.intoSettings {  }
+		gradle.intoBuild      { genBlankScript() }
+		gradle.intoSettings   {  }
+		gradle.intoProperties { genProperties() }
 		
 		gradle.intoResourceAt(FabricModJson)
 		{
@@ -65,10 +73,33 @@ object MetadataGenerationTest : StringSpec(
 				targetTask  = ProcessResourcesName
 			)
 		
-		gradle.intoBuild    { genBareMinimumScript() }
+		gradle.intoBuild      { genBareMinimumScript() }
+		gradle.intoSettings   {  }
+		gradle.intoProperties { genProperties() }
+		
+		gradle.run() outcomeOf GenerateModMetadataPath shouldBe SUCCESS
+	}
+	
+	"Pulls defaults from project"()
+	{
+		val gradle =
+			Gradle.createGradle(
+				projectPath = Path("metadata/projectDefaults"),
+				targetTask  = GenerateModMetadataName
+			)
+		
+		gradle.intoBuild    { genBlankScript() }
 		gradle.intoSettings {  }
 		
 		gradle.run() outcomeOf GenerateModMetadataPath shouldBe SUCCESS
+		
+		Path("run/metadata/projectDefaults/build/generated-resources/power-loom-main/$FabricModJson")
+			.source()
+			.buffer()
+			.use(BufferedSource::readUtf8) shouldBe
+				NameDescJson
+					.replaceFirst(TestModId, "project-defaults")
+					.replaceFirst(TestName, "projectDefaults")
 	}
 })
 {
@@ -86,6 +117,12 @@ object MetadataGenerationTest : StringSpec(
 		writeUtf8("$ScriptPrefix$ScriptSuffix".trimIndent())
 	}
 	
+	@JvmStatic
+	fun BufferedSink.genProperties()
+	{
+		writeUtf8("powerLoom.pullMetadataFromProject=false")
+	}
+	
 	// language=kts
 	private const val ScriptPrefix =
 		"""
@@ -93,6 +130,9 @@ object MetadataGenerationTest : StringSpec(
 			kotlin("jvm") version "1.5.31"
 			id("dev.strixpyrr.power-loom")
 		}
+		
+		version = "$TestModVersion"
+		description = "$TestDesc"
 		
 		mod {
 			metadata {
