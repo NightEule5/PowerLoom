@@ -33,6 +33,9 @@ class PowerLoomPlugin : Plugin<Project>
 			if (!hasPlugin("org.jetbrains.kotlin.jvm"          ) &&
 			    !hasPlugin("org.jetbrains.kotlin.multiplatform"))
 				throw Exception("The Kotlin plugin is not applied.")
+			
+			if (!hasPlugin("fabric-loom"))
+				throw Exception("The Fabric Loom plugin is not applied.")
 		}
 		
 		val props = target.properties()

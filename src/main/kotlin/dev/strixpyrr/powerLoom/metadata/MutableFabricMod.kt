@@ -22,6 +22,7 @@ import kotlinx.serialization.descriptors.PrimitiveKind.STRING
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import org.gradle.api.artifacts.Configuration
 import java.net.URI
 import java.nio.file.Path
 import kotlin.io.path.Path
@@ -208,6 +209,8 @@ data class DependencyContainer(
 		immutable.conflicts ?.let { conflicts  += it }
 		immutable.breaks    ?.let { breaks     += it }
 	}
+	
+	fun populate(configuration: Configuration) = populateFrom(configuration)
 	
 	companion object
 	{
