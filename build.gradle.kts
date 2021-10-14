@@ -16,6 +16,7 @@ version = "0.0.1"
 repositories()
 {
 	mavenCentral()
+	maven(url = "https://maven.fabricmc.net")
 }
 
 dependencies()
@@ -27,6 +28,7 @@ dependencies()
 	
 	implementation(deps.okio)
 	implementation(deps.kotlinx.serialization.json)
+	implementation(deps.fabric.loom)
 	
 	testImplementation(deps.kotest)
 	testImplementation(gradleTestKit())
