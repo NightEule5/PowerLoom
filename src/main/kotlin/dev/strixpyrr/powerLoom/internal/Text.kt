@@ -17,6 +17,7 @@ package dev.strixpyrr.powerLoom.internal
 
 import dev.strixpyrr.powerLoom.metadata.FabricMod.Companion.IdRegex
 import kotlin.math.min
+import kotlin.text.RegexOption.COMMENTS
 
 /**
  * Converts an input project name string into a valid mod Id. The input cannot be
@@ -143,3 +144,76 @@ internal fun String.toModId(): String
 
 private inline operator fun StringBuilder.plusAssign(value: Char  ) { append(value) }
 private inline operator fun StringBuilder.plusAssign(value: String) { append(value) }
+
+@Suppress("RegExpRepeatedSpace") // Comments Regex option is set.
+private val GradleVersionRangeRegex =
+	"""
+	[\[\]]     # Open or closed start bracket
+	[^\[\],]+, # Start version
+	[^\[\],]+  # End version
+	[\[\]]     # Open or closed end bracket
+	""".trimIndent().toRegex(option = COMMENTS)
+
+private val SingleVersionRegex = "[\\w.+-]+".toRegex()
+
+private val MavenVersionRangeRegex =
+	"""
+	[\[\](] # Inclusive or exclusive start bracket
+	[\w.+-]+ # Start version
+	\s*,\s* # Comma
+	[\w.+-]+ # End version
+	[\[\])] # Inclusive or exclusive end bracket
+	""".trimIndent().toRegex(option = COMMENTS)
+
+private val PrefixVersionRange = "[\\w.+-]+\\.\\+".toRegex()
+
+internal fun String?.toModDepVersion(canBeUpgraded: Boolean = false): String
+{
+	if (isNullOrEmpty()) return "*"
+	
+	if (this matches MavenVersionRangeRegex)
+	{
+		val lastIndex = lastIndex
+		
+		val startBracket   = this[0        ]
+		val   endBracket   = this[lastIndex]
+		val delimiterIndex = indexOf(',', 1)
+		val startComponent = substring(1, delimiterIndex)
+		val   endComponent = substring(delimiterIndex + 1, lastIndex)
+		
+		val isStartInclusive = startBracket == '['
+		val isEndInclusive   =   endBracket == ']'
+		
+		return convertToNpmSemver(
+			startComponent,
+			  endComponent,
+			isStartInclusive,
+			isEndInclusive
+		)
+	}
+	
+	if (this matches PrefixVersionRange)
+		return convertPrefixToNpmSemver()
+	
+	if (this matches SingleVersionRegex)
+		return if (canBeUpgraded)
+			convertToNpmSemver()
+		else this
+	
+	throw IllegalArgumentException("$this is not a valid version specification.")
+}
+
+private fun convertToNpmSemver(
+	start: String,
+	end: String,
+	isStartInclusive: Boolean,
+	isEndInclusive: Boolean
+) = "${
+		if (isStartInclusive) ">=" else ">"
+	} $start ${
+		if (isEndInclusive) ">=" else ">"
+	} $end"
+
+private fun String.convertToNpmSemver() = ">= $this"
+
+private fun String.convertPrefixToNpmSemver() = substring(0, length - 2) + 'x'

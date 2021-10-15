@@ -13,11 +13,66 @@
 // limitations under the License.
 package dev.strixpyrr.powerLoom.metadata
 
+import dev.strixpyrr.powerLoom.internal.toModDepVersion
 import dev.strixpyrr.powerLoom.internal.toModId
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.Dependency
+import org.gradle.api.artifacts.ExternalDependency
 
-internal fun DependencyContainer.populateFrom(configuration: Configuration) = depends.run()
+internal fun DependencyContainer.populateFrom(configuration: Configuration)
 {
 	for (dependency in configuration.dependencies)
-		this[dependency.name.toModId()] = dependency.version /* .toModDepVersion() */!!
+		dependency.toModDependency(container = this)
+}
+
+private fun Dependency.toModDependency(container: DependencyContainer)
+{
+	val modId = name.toModId()
+	
+	when (this)
+	{
+		is ExternalDependency -> versionConstraint.run()
+		{
+			val strict    =    strictVersion.ifEmpty { null }
+			val required  =  requiredVersion.ifEmpty { null }
+			val preferred = preferredVersion.ifEmpty { null }
+			val rejected  = rejectedVersions
+			
+			val versions = mutableList<String>(2)
+			
+			if (preferred != null)
+				versions += preferred.toModDepVersion()
+			
+			versions +=
+				(strict ?: required).toModDepVersion(
+					canBeUpgraded = strict == null
+				)
+			
+			container.depends[modId] = versions
+			
+			if (rejected.isNotEmpty())
+			{
+				val breaking = container.breaks[modId].let()
+				{ existing ->
+					mutableList(
+						existing sizeOr 0 + rejected.size,
+						existing.orEmpty()
+					)
+				}
+				
+				container.breaks[modId] =
+					rejected.mapTo(breaking) { it.toModDepVersion() }
+			}
+		}
+		else                  ->
+			container.depends[modId] =
+				version.toModDepVersion(
+					canBeUpgraded = true
+				)
+	}
+}
+
+private operator fun MutableMap<String, List<String>>.set(key: String, value: String)
+{
+	this[key] = this[key].orEmpty() + value
 }
