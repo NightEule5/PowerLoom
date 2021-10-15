@@ -183,11 +183,11 @@ class MutableEntryPoints(
 
 @Serializable
 data class DependencyContainer(
-	val depends   : MutableMap<String, String> = mutableMap(DependencyCapacity),
-	val recommends: MutableMap<String, String> = mutableMap(DependencyCapacity),
-	val suggests  : MutableMap<String, String> = mutableMap(DependencyCapacity),
-	val conflicts : MutableMap<String, String> = mutableMap(DependencyCapacity),
-	val breaks    : MutableMap<String, String> = mutableMap(DependencyCapacity)
+	val depends   : MutableMap<String, List<String>> = mutableMap(DependencyCapacity),
+	val recommends: MutableMap<String, List<String>> = mutableMap(DependencyCapacity),
+	val suggests  : MutableMap<String, List<String>> = mutableMap(DependencyCapacity),
+	val conflicts : MutableMap<String, List<String>> = mutableMap(DependencyCapacity),
+	val breaks    : MutableMap<String, List<String>> = mutableMap(DependencyCapacity)
 ) : JSerializable
 {
 	constructor(immutable: FabricMod) : this(
