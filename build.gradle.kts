@@ -1,12 +1,15 @@
 
 import dev.strixpyrr.shorthand.CompilerArgumentScope.Companion.RequiresOptIn
 import dev.strixpyrr.shorthand.JvmDefaultMode.All
+import dev.strixpyrr.shorthand.creating
 import dev.strixpyrr.shorthand.freeCompilerArgs
+import dev.strixpyrr.shorthand.getting
 
 plugins {
 	kotlin("jvm")                  version "1.6.0-RC"
 	kotlin("plugin.serialization") version "1.6.0-RC"
 	id("dev.strixpyrr.shorthand")
+	`maven-publish`
 	`java-gradle-plugin`
 }
 
@@ -78,6 +81,19 @@ gradlePlugin()
 		{
 			id = "dev.strixpyrr.power-loom"
 			implementationClass = "dev.strixpyrr.powerLoom.PowerLoomPlugin"
+		}
+	}
+}
+
+publishing()
+{
+	publications()
+	{
+		val powerLoom: MavenPublication by creating()
+		{
+			from(components["kotlin"])
+			
+			artifact(tasks.kotlinSourcesJar)
 		}
 	}
 }
