@@ -36,7 +36,7 @@ plugins {
 
 ## Planned Features
 
-- [ ] `fabric.mod.json` generation
+- [x] `fabric.mod.json` generation
 - [ ] Mod downloading
 - [ ] CurseForge and Modrinth publishing
 - [ ] Unified binaries for multi-project builds
