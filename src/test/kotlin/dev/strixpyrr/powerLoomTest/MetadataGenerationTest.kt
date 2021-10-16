@@ -18,6 +18,7 @@ package dev.strixpyrr.powerLoomTest
 import dev.strixpyrr.powerLoomTest.Gradle.outcomeOf
 import dev.strixpyrr.powerLoomTest.MetadataGenerationTest.genBareMinimumScript
 import dev.strixpyrr.powerLoomTest.MetadataGenerationTest.genBlankScript
+import dev.strixpyrr.powerLoomTest.MetadataGenerationTest.genDependencyScript
 import dev.strixpyrr.powerLoomTest.MetadataGenerationTest.genProperties
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
@@ -88,7 +89,7 @@ object MetadataGenerationTest : StringSpec(
 				targetTask  = GenerateModMetadataName
 			)
 		
-		gradle.intoBuild    { genBlankScript() }
+		gradle.intoBuild    { genDependencyScript() }
 		gradle.intoSettings {  }
 		
 		gradle.run() outcomeOf GenerateModMetadataPath shouldBe SUCCESS
@@ -97,7 +98,7 @@ object MetadataGenerationTest : StringSpec(
 			.source()
 			.buffer()
 			.use(BufferedSource::readUtf8) shouldBe
-				NameDescJson
+				NameDescDepJson
 					.replaceFirst(TestModId, "project-defaults")
 					.replaceFirst(TestName, "projectDefaults")
 	}
@@ -108,13 +109,19 @@ object MetadataGenerationTest : StringSpec(
 	{
 		// Huh, apparently trimIndent interprets at compile-time for constants. It
 		// has apparently been this way since 1.3.40, but I never realized it. Pog
-		writeUtf8("$ScriptPrefix$ScriptRequiredFields$ScriptSuffix".trimIndent())
+		writeUtf8("$ScriptPrefix$ScriptModBlockPrefix$ScriptRequiredFields$ScriptModBlockSuffix".trimIndent())
 	}
 	
 	@JvmStatic
 	fun BufferedSink.genBlankScript()
 	{
-		writeUtf8("$ScriptPrefix$ScriptSuffix".trimIndent())
+		writeUtf8("$ScriptPrefix$ScriptModBlockPrefix$ScriptModBlockSuffix".trimIndent())
+	}
+	
+	@JvmStatic
+	fun BufferedSink.genDependencyScript()
+	{
+		writeUtf8("$ScriptPrefix$ScriptDependencies$ScriptModBlockPrefix$ScriptDependencyField$ScriptModBlockSuffix".trimIndent())
 	}
 	
 	@JvmStatic
@@ -128,18 +135,23 @@ object MetadataGenerationTest : StringSpec(
 		"""
 		plugins {
 			kotlin("jvm") version "1.5.31"
+			id("fabric-loom")
 			id("dev.strixpyrr.power-loom")
 		}
 		
 		version = "$TestModVersion"
 		description = "$TestDesc"
-		
+		"""
+	
+	// language=kts
+	private const val ScriptModBlockPrefix =
+		"""
 		mod {
 			metadata {
 		"""
 	
 	// language=kts
-	private const val ScriptSuffix =
+	private const val ScriptModBlockSuffix =
 		"""
 			}
 		}
@@ -150,5 +162,31 @@ object MetadataGenerationTest : StringSpec(
 		"""
 				id = "$TestModId"
 				version = "$TestModVersion"
+		"""
+	
+	// language=kts
+	private const val ScriptDependencyField =
+		"""
+				dependencies.run {
+					val modImplementation by configurations
+
+					populate(modImplementation)
+				}
+		"""
+	
+	// language=kts
+	private const val ScriptDependencies =
+		"""
+		repositories {
+			maven(url = "https://maven.fabricmc.net")
+		}
+
+		dependencies {
+			minecraft(group = "org.mojang", name = "minecraft", version = "1.17.1")
+
+			mappings(group = "net.fabricmc", name = "yarn", version = "1.17.1+build.61")
+
+			modImplementation(group = "net.fabricmc", name = "fabric-language-kotlin", version = "1.6.5+kotlin.1.5.31")
+		}
 		"""
 }
