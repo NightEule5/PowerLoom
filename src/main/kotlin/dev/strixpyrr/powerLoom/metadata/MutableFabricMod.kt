@@ -166,6 +166,8 @@ class MutableEntryPoints(
 		immutable.client?.let { client += it }
 	}
 	
+	inline operator fun invoke(populate: MutableEntryPoints.() -> Unit) = this.populate()
+	
 	fun freeze() =
 		EntryPoints(
 			common.toSet().nullIfEmpty(),
@@ -211,6 +213,8 @@ data class DependencyContainer(
 	}
 	
 	fun populate(configuration: Configuration) = populateFrom(configuration)
+	
+	inline operator fun invoke(populate: DependencyContainer.() -> Unit) = this.populate()
 	
 	companion object
 	{
@@ -261,6 +265,8 @@ data class MetadataContainer(
 		immutable.authors     ?.let { authors      += it }
 		immutable.contributors?.let { contributors += it }
 	}
+	
+	inline operator fun invoke(populate: MetadataContainer.() -> Unit) = this.populate()
 	
 	companion object
 	{
@@ -322,6 +328,8 @@ class MutableContactInfo(
 				}
 		}
 	}
+	
+	inline operator fun invoke(populate: MutableContactInfo.() -> Unit) = this.populate()
 	
 	fun freeze() =
 		ContactInfo(
