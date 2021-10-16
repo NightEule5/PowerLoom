@@ -109,6 +109,28 @@ data class FabricMod internal constructor(
 	fun encode(sink: BufferedSink) =
 		json.encodeToStream(value = this, stream = sink.outputStream())
 	
+	@Suppress("SpellCheckingInspection")
+	object Licenses
+	{
+		// Some commonly used licenses (according to ChooseALicense) given as SPDX
+		// Ids.
+		
+		const val AGPLv3 = "AGPL-3.0"
+		const val  GPLv3 =  "GPL-3.0"
+		const val LGPLv3 = "LGPL-3.0"
+		
+		const val Mozilla2_0 = "MPL-2.0"
+		const val  Apache2_0 = "Apache-2.0"
+		const val   Boost1_0 = "BSL-1.0"
+		const val Mozilla = Mozilla2_0
+		const val Apache  =  Apache2_0
+		const val Boost   =   Boost1_0
+		
+		const val MIT = "MIT"
+		
+		const val Unlicense = "Unlicense"
+	}
+	
 	companion object
 	{
 		// Language = Regex

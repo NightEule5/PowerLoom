@@ -15,6 +15,9 @@
 
 package dev.strixpyrr.powerLoom.metadata
 
+import dev.strixpyrr.powerLoom.metadata.EntryPoint.Adapters.Default
+import dev.strixpyrr.powerLoom.metadata.EntryPoint.Adapters.Kotlin
+import dev.strixpyrr.powerLoom.metadata.EntryPoint.Adapters.Scala
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
@@ -175,6 +178,127 @@ class MutableEntryPoints(
 			client.toSet().nullIfEmpty()
 		)
 	
+	// Shortcuts
+	
+	inline fun kotlinCommon(block: KotlinEntryPointSpec.() -> Unit) =
+		commitCommon(KotlinEntryPointSpec().apply(block))
+	
+	inline fun kotlinClient(block: KotlinEntryPointSpec.() -> Unit) =
+		commitClient(KotlinEntryPointSpec().apply(block))
+	
+	inline fun kotlinServer(block: KotlinEntryPointSpec.() -> Unit) =
+		commitServer(KotlinEntryPointSpec().apply(block))
+	
+	@PublishedApi
+	internal fun commitCommon(spec: KotlinEntryPointSpec) = spec.commit(common)
+	
+	@PublishedApi
+	internal fun commitClient(spec: KotlinEntryPointSpec) = spec.commit(client)
+	
+	@PublishedApi
+	internal fun commitServer(spec: KotlinEntryPointSpec) = spec.commit(server)
+	
+	fun kotlinCommon(
+		 packageName: String,
+		   className: String,
+		functionName: String = ""
+	) = common(packageName, className, functionName, adapter = Kotlin)
+	
+	fun scalaCommon(
+		 packageName: String,
+		   className: String,
+		functionName: String = ""
+	) = common(packageName, className, functionName, adapter = Scala)
+	
+	fun common(
+		 packageName: String,
+		   className: String,
+		functionName: String = "",
+		adapter     : String = Default
+	)
+	{
+		common += toEp(packageName, className, functionName, adapter)
+	}
+	
+	fun kotlinClient(
+		 packageName: String,
+		   className: String,
+		functionName: String = ""
+	) = client(packageName, className, functionName, adapter = Kotlin)
+	
+	fun scalaClient(
+		 packageName: String,
+		   className: String,
+		functionName: String = ""
+	) = client(packageName, className, functionName, adapter = Scala)
+	
+	fun client(
+		 packageName: String,
+		   className: String,
+		functionName: String = "",
+		adapter     : String = Default
+	)
+	{
+		client += toEp(packageName, className, functionName, adapter)
+	}
+	
+	fun kotlinServer(
+		 packageName: String,
+		   className: String,
+		functionName: String = ""
+	) = server(packageName, className, functionName, adapter = Kotlin)
+	
+	fun scalaServer(
+		 packageName: String,
+		   className: String,
+		functionName: String = ""
+	) = server(packageName, className, functionName, adapter = Scala)
+	
+	fun server(
+		 packageName: String,
+		   className: String,
+		functionName: String = "",
+		adapter     : String = Default
+	)
+	{
+		server += toEp(packageName, className, functionName, adapter)
+	}
+	
+	class KotlinEntryPointSpec @PublishedApi internal constructor()
+	{
+		private var `package` = ""
+		private var `class`   = ""
+		private var function  = ""
+		
+		infix fun inPackage(packageName: String) = apply { this.`package` = packageName }
+		
+		infix fun inClass(className: String) = apply { this.`class` = className }
+		
+		infix fun inCompanionOf(className: String) = inClass("$className\$Companion")
+		
+		infix fun inFile(fileName: String) = inClass("${fileName}Kt")
+		
+		infix fun function(functionName: String) = apply { this.function = functionName }
+		
+		@PublishedApi
+		internal fun commit(list: MutableList<EntryPoint>) =
+			toEp(
+				`package`.ifEmpty { throw IllegalArgumentException(EmptyPackage) },
+				`class`  .ifEmpty { throw IllegalArgumentException(EmptyClass  ) },
+				function,
+				adapter = Kotlin
+			)
+		
+		private companion object
+		{
+			private const val EmptyPackage =
+				"The Package cannot be empty. Invoke inPackage to set the package."
+			private const val EmptyClass   =
+				"The Class cannot be empty. Invoke inClass, inCompanionOf, or " +
+				"inFile to set the class."
+		}
+	}
+	
 	companion object
 	{
 		// Serialization
@@ -182,6 +306,27 @@ class MutableEntryPoints(
 		private const val serialVersionUID = 1L
 	}
 }
+
+internal fun toEp(
+	 packageName: String,
+	   className: String,
+	functionName: String,
+	adapter     : String
+) = EntryPoint(
+		formatEpPath(
+			 packageName,
+			   className,
+			functionName
+		), adapter
+	)
+
+internal fun formatEpPath(
+	 packageName: String,
+	   className: String,
+	functionName: String
+) = if (functionName.isEmpty())
+		"$packageName.$className"
+	else "$packageName.$className::$functionName"
 
 @Serializable
 data class DependencyContainer(
@@ -215,6 +360,47 @@ data class DependencyContainer(
 	fun populate(configuration: Configuration) = populateFrom(configuration)
 	
 	inline operator fun invoke(populate: DependencyContainer.() -> Unit) = this.populate()
+	
+	// Shortcuts
+	
+	fun dependOn(modId: String, version: String) = dependOn(modId, listOf(version))
+	
+	fun dependOn(modId: String, vararg versions: String) = dependOn(modId, listOf(*versions))
+	
+	fun dependOn(modId: String, versions: List<String>) = depends.add(modId, versions)
+	
+	fun recommend(modId: String, version: String) = recommend(modId, listOf(version))
+	
+	fun recommend(modId: String, vararg versions: String) = recommend(modId, listOf(*versions))
+	
+	fun recommend(modId: String, versions: List<String>) = recommends.add(modId, versions)
+	
+	fun suggest(modId: String, version: String) = suggest(modId, listOf(version))
+	
+	fun suggest(modId: String, vararg versions: String) = suggest(modId, listOf(*versions))
+	
+	fun suggest(modId: String, versions: List<String>) = suggests.add(modId, versions)
+	
+	fun specifyConflict(modId: String, version: String) = specifyConflict(modId, listOf(version))
+	
+	fun specifyConflict(modId: String, vararg versions: String) = specifyConflict(modId, listOf(*versions))
+	
+	fun specifyConflict(modId: String, versions: List<String>) = conflicts.add(modId, versions)
+	
+	fun specifyBreak(modId: String, version: String) = specifyBreak(modId, listOf(version))
+	
+	fun specifyBreak(modId: String, vararg versions: String) = specifyBreak(modId, listOf(*versions))
+	
+	fun specifyBreak(modId: String, versions: List<String>) = breaks.add(modId, versions)
+	
+	private fun MutableMap<String, List<String>>.add(modId: String, versions: List<String>)
+	{
+		this[modId] = when (val existingVersions = this[modId])
+		{
+			null -> versions
+			else -> existingVersions + versions
+		}
+	}
 	
 	companion object
 	{
@@ -267,6 +453,20 @@ data class MetadataContainer(
 	}
 	
 	inline operator fun invoke(populate: MetadataContainer.() -> Unit) = this.populate()
+	
+	// Shortcuts
+	
+	fun author(name: String                          ) { authors += Person(name             ) }
+	fun author(name: String, contactInfo: ContactInfo) { authors += Person(name, contactInfo) }
+	
+	inline fun author(name: String, populate: MutableContactInfo.() -> Unit) =
+		author(name, MutableContactInfo().apply(populate).freeze())
+	
+	fun contributor(name: String                          ) { contributors += Person(name             ) }
+	fun contributor(name: String, contactInfo: ContactInfo) { contributors += Person(name, contactInfo) }
+	
+	inline fun contributor(name: String, populate: MutableContactInfo.() -> Unit) =
+		contributor(name, MutableContactInfo().apply(populate).freeze())
 	
 	companion object
 	{
