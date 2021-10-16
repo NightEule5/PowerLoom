@@ -21,7 +21,7 @@ pluginManagement {
     }
 
     plugins {
-        id("dev.strixpyrr.power-loom") version "0.1.0"
+        id("dev.strixpyrr.powerloom") version "0.1.0"
     }
 }
 ```
@@ -29,7 +29,7 @@ pluginManagement {
 In your `build.gradle.kts`:
 ```kotlin
 plugins {
-    id("dev.strixpyrr.power-loom")
+    id("dev.strixpyrr.powerloom")
 }
 ```
 

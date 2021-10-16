@@ -13,7 +13,7 @@ plugins {
 	`java-gradle-plugin`
 }
 
-group = "dev.strixpyrr.power-loom"
+group = "dev.strixpyrr.powerloom"
 version = "0.1.0"
 
 repositories()
@@ -79,7 +79,7 @@ gradlePlugin()
 	{
 		val powerLoom by creating()
 		{
-			id = "dev.strixpyrr.power-loom"
+			id = "dev.strixpyrr.powerloom"
 			implementationClass = "dev.strixpyrr.powerLoom.PowerLoomPlugin"
 		}
 	}

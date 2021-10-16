@@ -25,4 +25,4 @@ dependencyResolutionManagement()
 	}
 }
 
-rootProject.name = "power-loom"
+rootProject.name = "powerloom"
