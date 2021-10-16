@@ -10,8 +10,7 @@ for implemented vs planned features.**
 
 ## Testing
 
-While this project is in early development, you can test by building a commit via
-Jitpack:
+While this project is in early development, you can test by building via Jitpack:
 
 In your `settings.gradle.kts`:
 ```kotlin
@@ -22,7 +21,7 @@ pluginManagement {
     }
 
     plugins {
-        id("dev.strixpyrr.power-loom") version "[Commit]"
+        id("dev.strixpyrr.power-loom") version "0.1.0"
     }
 }
 ```
