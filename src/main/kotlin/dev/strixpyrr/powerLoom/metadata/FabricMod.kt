@@ -148,7 +148,7 @@ data class EntryPoint(
 {
 	init
 	{
-		require(value.isEmpty()) { "The entry point value cannot be empty." }
+		require(value.isNotEmpty()) { "The entry point value cannot be empty." }
 	}
 	
 	object Adapters
