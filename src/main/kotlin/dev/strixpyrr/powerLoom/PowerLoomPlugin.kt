@@ -40,7 +40,7 @@ class PowerLoomPlugin : Plugin<Project>
 		
 		val props = target.properties()
 		
-		val mod = ModExtension()
+		val mod = ModExtension(target)
 		
 		target.extensions.add(ModExtension::class.java, ModExtension.Name, mod)
 		

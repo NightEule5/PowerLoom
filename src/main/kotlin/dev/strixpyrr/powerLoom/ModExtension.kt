@@ -16,10 +16,18 @@ package dev.strixpyrr.powerLoom
 import dev.strixpyrr.powerLoom.internal.toModId
 import dev.strixpyrr.powerLoom.metadata.MutableFabricMod
 import org.gradle.api.Project
+import java.nio.file.Path
+import kotlin.io.path.Path
 
-class ModExtension internal constructor()
+class ModExtension internal constructor(private val project: Project)
 {
 	var metadata = MutableFabricMod()
+	
+	/**
+	 * Embeds the specified license file into the jar. If the path is relative, it
+	 * will be interpreted from the root project directory.
+	 */
+	fun embedLicense(path: Path = Path("LICENSE")) = project.embedLicense(path)
 	
 	internal fun populateFrom(project: Project) = metadata()
 	{
