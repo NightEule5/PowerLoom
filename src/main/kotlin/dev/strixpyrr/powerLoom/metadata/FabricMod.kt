@@ -23,6 +23,7 @@ import okio.BufferedSink
 import okio.BufferedSource
 import java.net.URI
 import java.nio.file.Path
+import java.io.Serializable as JSerializable
 
 
 // Mostly implements the spec:
@@ -166,7 +167,7 @@ enum class Environment
 data class EntryPoint(
 	val value  : String,
 	val adapter: String = Adapters.Default
-)
+) : JSerializable
 {
 	init
 	{
@@ -178,6 +179,13 @@ data class EntryPoint(
 		const val Default = "default"
 		const val Kotlin  = "kotlin"
 		const val Scala   = "scala"
+	}
+	
+	companion object
+	{
+		// Serialization
+		
+		private const val serialVersionUID = 1L
 	}
 }
 
@@ -199,21 +207,35 @@ data class EntryPoints(
 }
 
 @Serializable
-data class NestedJar(val file: String)
+data class NestedJar(val file: String) : JSerializable
 {
 	constructor(file: Path) : this("$file")
+	
+	companion object
+	{
+		// Serialization
+		
+		private const val serialVersionUID = 1L
+	}
 }
 
 @Serializable
 data class Mixin(
 	val config     : String,
 	val environment: Environment = Environment.Either
-)
+) : JSerializable
 {
 	constructor(
 		config     : Path,
 		environment: Environment = Environment.Either
 	) : this("$config", environment)
+	
+	companion object
+	{
+		// Serialization
+		
+		private const val serialVersionUID = 1L
+	}
 }
 
 @Serializable
@@ -221,7 +243,7 @@ data class Person(
 	val name: String,
 	@Serializable(with = ContactInfoSerializer::class)
 	val contact: ContactInfo? = null
-)
+) : JSerializable
 {
 	fun trimEmptyContact() = when (val contact = contact)
 	{
@@ -230,6 +252,13 @@ data class Person(
 			if (contact.isEmpty)
 				copy(name = name, contact = null)
 			else this
+	}
+	
+	companion object
+	{
+		// Serialization
+		
+		private const val serialVersionUID = 1L
 	}
 }
 
@@ -387,7 +416,7 @@ data class ContactInfo internal constructor(
 data class Icon internal constructor(
 	val path: String? = null,
 	val paths: Map<String, String>? = null
-)
+) : JSerializable
 {
 	constructor(path: Path) : this("$path")
 	
@@ -410,6 +439,10 @@ data class Icon internal constructor(
 		@JvmStatic
 		operator fun invoke(paths: Map<String, Path>) =
 			Icon(paths.mapValues { "$it" })
+		
+		// Serialization
+		
+		private const val serialVersionUID = 1L
 	}
 }
 

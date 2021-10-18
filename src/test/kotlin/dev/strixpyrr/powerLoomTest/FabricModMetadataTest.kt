@@ -22,7 +22,6 @@ import io.kotest.matchers.shouldBe
 import okio.Buffer
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
-import kotlin.io.path.Path
 
 @Suppress("BlockingMethodInNonBlockingContext")
 object FabricModMetadataTest : StringSpec(
@@ -92,7 +91,7 @@ object FabricModMetadataTest : StringSpec(
 			languageAdapters = mutableMapOf(
 				"non-default-language" to "*"
 			),
-			accessWidener = Path("$TestModId.accesswidener"),
+			accessWidener = "$TestModId.accesswidener",
 		)
 		
 		data()

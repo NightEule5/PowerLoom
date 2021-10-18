@@ -27,7 +27,6 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import org.gradle.api.artifacts.Configuration
 import java.net.URI
-import java.nio.file.Path
 import kotlin.io.path.Path
 import java.io.Serializable as JSerializable
 
@@ -50,7 +49,7 @@ data class MutableFabricMod(
 	val languageAdapters: MutableMap<String, String> = mutableMap(AdapterCapacity),
 	val dependencies    : DependencyContainer        = DependencyContainer(),
 	val metadata        : MetadataContainer = MetadataContainer(),
-	var accessWidener   : Path? = null
+	var accessWidener   : String? = null
 ) : JSerializable
 {
 	constructor(immutable: FabricMod) : this(
@@ -63,7 +62,7 @@ data class MutableFabricMod(
 		languageAdapters = mutableMap(immutable.languageAdapters sizeOr 0 + AdapterCapacity),
 		dependencies     = DependencyContainer(immutable),
 		metadata         =   MetadataContainer(immutable),
-		accessWidener    = immutable.accessWidener.toPath()
+		accessWidener    = immutable.accessWidener
 	)
 	
 	fun populateFrom(immutable: FabricMod) = this()
@@ -80,7 +79,7 @@ data class MutableFabricMod(
 		dependencies.populateWith(immutable)
 		metadata    .populateWith(immutable)
 		
-		immutable.accessWidener?.let { accessWidener = it.toPath() }
+		immutable.accessWidener?.let { accessWidener = it }
 	}
 	
 	inline operator fun invoke(populate: MutableFabricMod.() -> Unit) = this.populate()
@@ -125,7 +124,7 @@ data class MutableFabricMod(
 			contact.freeze(),
 			license,
 			icon,
-			accessWidener
+			accessWidener.toPath()
 		)
 	}
 	
