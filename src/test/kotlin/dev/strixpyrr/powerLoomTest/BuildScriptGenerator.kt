@@ -32,8 +32,8 @@ internal object BuildScriptGenerator
 	{
 		writeUtf8(PluginBlockWithFabric .trimIndent() + "\n\n")
 		writeUtf8(ProjectFields         .trimIndent() + "\n\n")
-		writeUtf8(DependencyModBlock    .trimIndent() + "\n\n")
-		writeUtf8(FabricDependencyBlocks.trimIndent())
+		writeUtf8(FabricDependencyBlocks.trimIndent() + "\n\n")
+		writeUtf8(DependencyModBlock    .trimIndent())
 	}
 	
 	@JvmStatic
