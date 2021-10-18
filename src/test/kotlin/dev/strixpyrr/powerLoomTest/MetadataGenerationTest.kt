@@ -15,6 +15,7 @@
 
 package dev.strixpyrr.powerLoomTest
 
+import dev.strixpyrr.powerLoom.metadata.FabricMod
 import dev.strixpyrr.powerLoomTest.BuildScriptGenerator.genBareMinimum
 import dev.strixpyrr.powerLoomTest.BuildScriptGenerator.genBlank
 import dev.strixpyrr.powerLoomTest.BuildScriptGenerator.genDefaultPulling
@@ -22,9 +23,6 @@ import dev.strixpyrr.powerLoomTest.BuildScriptGenerator.genProperties
 import dev.strixpyrr.powerLoomTest.Gradle.outcomeOf
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
-import okio.BufferedSource
-import okio.buffer
-import okio.source
 import org.gradle.testkit.runner.TaskOutcome.SUCCESS
 import kotlin.io.path.Path
 
@@ -47,6 +45,8 @@ object MetadataGenerationTest : StringSpec(
 		deleteMetadataOutput(project)
 		
 		gradle.run() outcomeOf GenerateModMetadataPath shouldBe SUCCESS
+		
+		metadataOutput(project) shouldBe FabricMod(TestModId, TestModVersion)
 	}
 	
 	"Generates bare-minimum fabric.mod.json using replacement file"()
@@ -71,6 +71,8 @@ object MetadataGenerationTest : StringSpec(
 		}
 		
 		gradle.run() outcomeOf GenerateModMetadataPath shouldBe SUCCESS
+		
+		metadataOutput(project) shouldBe FabricMod(TestModId, TestModVersion)
 	}
 	
 	"Hooks into processResources"()
@@ -90,6 +92,8 @@ object MetadataGenerationTest : StringSpec(
 		deleteMetadataOutput(project)
 		
 		gradle.run() outcomeOf GenerateModMetadataPath shouldBe SUCCESS
+		
+		metadataOutput(project) shouldBe FabricMod(TestModId, TestModVersion)
 	}
 	
 	"Pulls defaults from project"()
@@ -109,12 +113,15 @@ object MetadataGenerationTest : StringSpec(
 		
 		gradle.run() outcomeOf GenerateModMetadataPath shouldBe SUCCESS
 		
-		Path("run/metadata/projectDefaults/build/generated-resources/power-loom-main/$FabricModJson")
-			.source()
-			.buffer()
-			.use(BufferedSource::readUtf8) shouldBe
-				NameDescDepJson
-					.replaceFirst(TestModId, "project-defaults")
-					.replaceFirst(TestName, "projectDefaults")
+		metadataOutput(project) shouldBe FabricMod(
+			id          = "project-defaults",
+			version     = TestModVersion,
+			description = TestDesc,
+			name        = "projectDefaults",
+			depends     = mapOf(
+				"fabric-language-kotlin" to
+					listOf(">= 1.6.5+kotlin.1.5.31")
+			)
+		)
 	}
 })

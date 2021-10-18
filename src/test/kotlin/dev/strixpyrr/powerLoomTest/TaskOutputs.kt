@@ -13,6 +13,11 @@
 // limitations under the License.
 package dev.strixpyrr.powerLoomTest
 
+import dev.strixpyrr.powerLoom.metadata.FabricMod
+import io.kotest.matchers.paths.shouldExist
+import okio.buffer
+import okio.source
+import okio.use
 import java.nio.file.Path
 import kotlin.io.path.Path
 import kotlin.io.path.deleteIfExists
@@ -28,3 +33,11 @@ private val MetadataOutputPath =
 
 internal fun deleteMetadataOutput(projectRoot: Path) =
 	(projectRoot / MetadataOutputPath).deleteIfExists()
+
+internal fun metadataOutput(projectRoot: Path) =
+	(projectRoot / MetadataOutputPath).let()
+	{ path ->
+		path.shouldExist()
+		
+		path.source().buffer().use { FabricMod.decode(it) }
+	}
