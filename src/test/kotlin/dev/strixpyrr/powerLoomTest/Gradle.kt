@@ -13,10 +13,8 @@
 // limitations under the License.
 package dev.strixpyrr.powerLoomTest
 
-import okio.BufferedSink
-import okio.buffer
-import okio.sink
-import okio.use
+import okio.*
+import okio.HashingSource.Companion.sha1
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.GradleRunner.create
@@ -26,6 +24,7 @@ import java.nio.file.StandardOpenOption.TRUNCATE_EXISTING
 import kotlin.io.path.Path
 import kotlin.io.path.createDirectories
 import kotlin.io.path.div
+import kotlin.io.path.notExists
 
 internal object Gradle
 {
@@ -37,8 +36,20 @@ internal object Gradle
 	) = GradleBuild(rootPath / projectPath, targetTask, arguments)
 	
 	@JvmStatic
-	internal fun openFile(root: Path, name: String) =
-		(root / name).createParents().sink(CREATE, TRUNCATE_EXISTING).buffer()
+	internal fun commitIfNewer(root: Path, name: String, buffer: Buffer)
+	{
+		(root / name).run()
+		{
+			if (isNewer(buffer)) openFile().use(buffer::readAll)
+		}
+	}
+	
+	@JvmStatic
+	private fun Path.isNewer(buffer: Buffer) =
+		notExists() || sha1(source()).use { it.hash } != buffer.sha1()
+	
+	@JvmStatic
+	private fun Path.openFile() = createParents().sink(CREATE, TRUNCATE_EXISTING)
 	
 	@JvmStatic
 	private fun Path.createParents() = apply { parent.createDirectories() }
@@ -68,40 +79,44 @@ internal object Gradle
 			projectDir
 		)
 		
-		fun openBuild() =
-			openFile(
+		fun intoBuild(buffer: Buffer) =
+			commitIfNewer(
 				root = projectDir,
-				name = "build.gradle.kts"
+				name = "build.gradle.kts",
+				buffer
 			)
 		
-		inline fun intoBuild(block: BufferedSink.() -> Unit) = openBuild().use(block)
+		inline fun intoBuild(block: BufferedSink.() -> Unit) = intoBuild(Buffer().apply(block))
 		
-		fun openSettings() =
-			openFile(
+		fun intoSettings(buffer: Buffer) =
+			commitIfNewer(
 				root = projectDir,
-				name = "settings.gradle.kts"
+				name = "settings.gradle.kts",
+				buffer
 			)
 		
-		inline fun intoSettings(block: BufferedSink.() -> Unit) = openSettings().use(block)
+		inline fun intoSettings(block: BufferedSink.() -> Unit) = intoSettings(Buffer().apply(block))
 		
-		fun openResourceAt(name: String) =
-			openFile(
+		fun intoResourceAt(name: String, buffer: Buffer) =
+			commitIfNewer(
 				root = projectDir / resPath,
-				name
+				name,
+				buffer
 			)
 		
 		inline fun intoResourceAt(
 			name: String,
 			block: BufferedSink.() -> Unit
-		) = openResourceAt(name).use(block)
+		) = this.intoResourceAt(name, Buffer().apply(block))
 		
-		fun openProperties() =
-			openFile(
+		fun intoProperties(buffer: Buffer) =
+			commitIfNewer(
 				root = projectDir,
-				name = "gradle.properties"
+				name = "gradle.properties",
+				buffer
 			)
 		
-		inline fun intoProperties(block: BufferedSink.() -> Unit) = openProperties().use(block)
+		inline fun intoProperties(block: BufferedSink.() -> Unit) = intoProperties(Buffer().apply(block))
 		
 		companion object
 		{
