@@ -15,14 +15,13 @@
 
 package dev.strixpyrr.powerLoomTest
 
+import dev.strixpyrr.powerLoomTest.BuildScriptGenerator.genBareMinimum
+import dev.strixpyrr.powerLoomTest.BuildScriptGenerator.genBlank
+import dev.strixpyrr.powerLoomTest.BuildScriptGenerator.genDefaultPulling
+import dev.strixpyrr.powerLoomTest.BuildScriptGenerator.genProperties
 import dev.strixpyrr.powerLoomTest.Gradle.outcomeOf
-import dev.strixpyrr.powerLoomTest.MetadataGenerationTest.genBareMinimumScript
-import dev.strixpyrr.powerLoomTest.MetadataGenerationTest.genBlankScript
-import dev.strixpyrr.powerLoomTest.MetadataGenerationTest.genDependencyScript
-import dev.strixpyrr.powerLoomTest.MetadataGenerationTest.genProperties
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
-import okio.BufferedSink
 import okio.BufferedSource
 import okio.buffer
 import okio.source
@@ -41,7 +40,7 @@ object MetadataGenerationTest : StringSpec(
 				targetTask  = GenerateModMetadataName
 			)
 		
-		gradle.intoBuild      { genBareMinimumScript() }
+		gradle.intoBuild      { genBareMinimum() }
 		gradle.intoSettings   {  }
 		gradle.intoProperties { genProperties() }
 		
@@ -60,7 +59,7 @@ object MetadataGenerationTest : StringSpec(
 				targetTask  = GenerateModMetadataName
 			)
 		
-		gradle.intoBuild      { genBlankScript() }
+		gradle.intoBuild      { genBlank() }
 		gradle.intoSettings   {  }
 		gradle.intoProperties { genProperties() }
 		
@@ -84,7 +83,7 @@ object MetadataGenerationTest : StringSpec(
 				targetTask  = ProcessResourcesName
 			)
 		
-		gradle.intoBuild      { genBareMinimumScript() }
+		gradle.intoBuild      { genBareMinimum() }
 		gradle.intoSettings   {  }
 		gradle.intoProperties { genProperties() }
 		
@@ -103,7 +102,7 @@ object MetadataGenerationTest : StringSpec(
 				targetTask  = GenerateModMetadataName
 			)
 		
-		gradle.intoBuild    { genDependencyScript() }
+		gradle.intoBuild    { genDefaultPulling() }
 		gradle.intoSettings {  }
 		
 		deleteMetadataOutput(project)
@@ -119,90 +118,3 @@ object MetadataGenerationTest : StringSpec(
 					.replaceFirst(TestName, "projectDefaults")
 	}
 })
-{
-	@JvmStatic
-	fun BufferedSink.genBareMinimumScript()
-	{
-		// Huh, apparently trimIndent interprets at compile-time for constants. It
-		// has apparently been this way since 1.3.40, but I never realized it. Pog
-		writeUtf8("$ScriptPrefix$ScriptModBlockPrefix$ScriptRequiredFields$ScriptModBlockSuffix".trimIndent())
-	}
-	
-	@JvmStatic
-	fun BufferedSink.genBlankScript()
-	{
-		writeUtf8("$ScriptPrefix$ScriptModBlockPrefix$ScriptModBlockSuffix".trimIndent())
-	}
-	
-	@JvmStatic
-	fun BufferedSink.genDependencyScript()
-	{
-		writeUtf8("$ScriptPrefix$ScriptDependencies$ScriptModBlockPrefix$ScriptDependencyField$ScriptModBlockSuffix".trimIndent())
-	}
-	
-	@JvmStatic
-	fun BufferedSink.genProperties()
-	{
-		writeUtf8("powerLoom.pullMetadataFromProject=false")
-	}
-	
-	// language=kts
-	private const val ScriptPrefix =
-		"""
-		plugins {
-			kotlin("jvm") version "1.6.0-RC"
-			id("fabric-loom")
-			id("dev.strixpyrr.powerloom")
-		}
-		
-		version = "$TestModVersion"
-		description = "$TestDesc"
-		"""
-	
-	// language=kts
-	private const val ScriptModBlockPrefix =
-		"""
-		mod {
-			metadata {
-		"""
-	
-	// language=kts
-	private const val ScriptModBlockSuffix =
-		"""
-			}
-		}
-		"""
-	
-	// language=kts
-	private const val ScriptRequiredFields =
-		"""
-				id = "$TestModId"
-				version = "$TestModVersion"
-		"""
-	
-	// language=kts
-	private const val ScriptDependencyField =
-		"""
-				dependencies.run {
-					val modImplementation by configurations
-
-					populate(modImplementation)
-				}
-		"""
-	
-	// language=kts
-	private const val ScriptDependencies =
-		"""
-		repositories {
-			maven(url = "https://maven.fabricmc.net")
-		}
-
-		dependencies {
-			minecraft(group = "org.mojang", name = "minecraft", version = "1.17.1")
-
-			mappings(group = "net.fabricmc", name = "yarn", version = "1.17.1+build.61")
-
-			modImplementation(group = "net.fabricmc", name = "fabric-language-kotlin", version = "1.6.5+kotlin.1.5.31")
-		}
-		"""
-}
