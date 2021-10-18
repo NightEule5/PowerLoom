@@ -150,7 +150,7 @@ object MetadataGenerationTest : StringSpec(
 	private const val ScriptPrefix =
 		"""
 		plugins {
-			kotlin("jvm") version "1.5.31"
+			kotlin("jvm") version "1.6.0-RC"
 			id("fabric-loom")
 			id("dev.strixpyrr.powerloom")
 		}
