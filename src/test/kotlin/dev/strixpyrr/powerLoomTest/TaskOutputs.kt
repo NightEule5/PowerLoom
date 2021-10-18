@@ -14,6 +14,7 @@
 package dev.strixpyrr.powerLoomTest
 
 import dev.strixpyrr.powerLoom.metadata.FabricMod
+import dev.strixpyrr.powerLoomTest.Gradle.rootPath
 import io.kotest.matchers.paths.shouldExist
 import okio.buffer
 import okio.source
@@ -32,10 +33,10 @@ private val MetadataOutputPath =
 	)
 
 internal fun deleteMetadataOutput(projectRoot: Path) =
-	(projectRoot / MetadataOutputPath).deleteIfExists()
+	(rootPath / projectRoot / MetadataOutputPath).deleteIfExists()
 
 internal fun metadataOutput(projectRoot: Path) =
-	(projectRoot / MetadataOutputPath).let()
+	(rootPath / projectRoot / MetadataOutputPath).let()
 	{ path ->
 		path.shouldExist()
 		

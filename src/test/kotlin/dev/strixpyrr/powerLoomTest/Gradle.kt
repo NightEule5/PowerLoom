@@ -57,7 +57,7 @@ internal object Gradle
 	@JvmStatic
 	infix fun BuildResult.outcomeOf(path: String) = task(path)?.outcome
 	
-	@JvmStatic private val rootPath = Path("run")
+	@JvmField internal val rootPath = Path("run")
 	
 	private const val CurrentVersion = "7.2"
 	
