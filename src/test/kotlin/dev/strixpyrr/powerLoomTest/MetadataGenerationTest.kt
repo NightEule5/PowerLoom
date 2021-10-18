@@ -152,7 +152,7 @@ object MetadataGenerationTest : StringSpec(
 		plugins {
 			kotlin("jvm") version "1.5.31"
 			id("fabric-loom")
-			id("dev.strixpyrr.power-loom")
+			id("dev.strixpyrr.powerloom")
 		}
 		
 		version = "$TestModVersion"
