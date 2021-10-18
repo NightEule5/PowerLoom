@@ -21,7 +21,7 @@ pluginManagement {
     }
 
     plugins {
-        id("dev.strixpyrr.powerloom") version "0.1.0"
+        id("dev.strixpyrr.powerloom") version "0.1.1"
     }
 }
 ```
