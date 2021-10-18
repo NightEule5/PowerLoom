@@ -30,16 +30,16 @@ internal object BuildScriptGenerator
 	@JvmStatic
 	fun BufferedSink.genDefaultPulling()
 	{
-		writeUtf8(PluginBlockWithFabric .trimIndent())
-		writeUtf8(ProjectFields         .trimIndent())
-		writeUtf8(DependencyModBlock    .trimIndent())
+		writeUtf8(PluginBlockWithFabric .trimIndent() + "\n\n")
+		writeUtf8(ProjectFields         .trimIndent() + "\n\n")
+		writeUtf8(DependencyModBlock    .trimIndent() + "\n\n")
 		writeUtf8(FabricDependencyBlocks.trimIndent())
 	}
 	
 	@JvmStatic
 	fun BufferedSink.genBlank()
 	{
-		writeUtf8(BasePluginBlock.trimIndent())
+		writeUtf8(BasePluginBlock.trimIndent() + "\n\n")
 	}
 	
 	@JvmStatic
