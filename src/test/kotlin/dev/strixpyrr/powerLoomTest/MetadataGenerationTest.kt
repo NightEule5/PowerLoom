@@ -33,9 +33,11 @@ object MetadataGenerationTest : StringSpec(
 {
 	"Generates bare-minimum fabric.mod.json"()
 	{
+		val project = Path("metadata/bareMin")
+		
 		val gradle =
 			Gradle.createGradle(
-				projectPath = Path("metadata/bareMin"),
+				projectPath = project,
 				targetTask  = GenerateModMetadataName
 			)
 		
@@ -43,20 +45,26 @@ object MetadataGenerationTest : StringSpec(
 		gradle.intoSettings   {  }
 		gradle.intoProperties { genProperties() }
 		
+		deleteMetadataOutput(project)
+		
 		gradle.run() outcomeOf GenerateModMetadataPath shouldBe SUCCESS
 	}
 	
 	"Generates bare-minimum fabric.mod.json using replacement file"()
 	{
+		val project = Path("metadata/bareMinReplFile")
+		
 		val gradle =
 			Gradle.createGradle(
-				projectPath = Path("metadata/bareMinReplFile"),
+				projectPath = project,
 				targetTask  = GenerateModMetadataName
 			)
 		
 		gradle.intoBuild      { genBlankScript() }
 		gradle.intoSettings   {  }
 		gradle.intoProperties { genProperties() }
+		
+		deleteMetadataOutput(project)
 		
 		gradle.intoResourceAt(FabricModJson)
 		{
@@ -68,9 +76,11 @@ object MetadataGenerationTest : StringSpec(
 	
 	"Hooks into processResources"()
 	{
+		val project = Path("metadata/procResHook")
+		
 		val gradle =
 			Gradle.createGradle(
-				projectPath = Path("metadata/procResHook"),
+				projectPath = project,
 				targetTask  = ProcessResourcesName
 			)
 		
@@ -78,19 +88,25 @@ object MetadataGenerationTest : StringSpec(
 		gradle.intoSettings   {  }
 		gradle.intoProperties { genProperties() }
 		
+		deleteMetadataOutput(project)
+		
 		gradle.run() outcomeOf GenerateModMetadataPath shouldBe SUCCESS
 	}
 	
 	"Pulls defaults from project"()
 	{
+		val project = Path("metadata/projectDefaults")
+		
 		val gradle =
 			Gradle.createGradle(
-				projectPath = Path("metadata/projectDefaults"),
+				projectPath = project,
 				targetTask  = GenerateModMetadataName
 			)
 		
 		gradle.intoBuild    { genDependencyScript() }
 		gradle.intoSettings {  }
+		
+		deleteMetadataOutput(project)
 		
 		gradle.run() outcomeOf GenerateModMetadataPath shouldBe SUCCESS
 		
