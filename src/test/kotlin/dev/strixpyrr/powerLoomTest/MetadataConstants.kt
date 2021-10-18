@@ -24,6 +24,9 @@ internal const val TestDesc       = "Very descriptive"
 
 internal const val InvalidTestModId = "-test"
 
+internal const val TestEntryPointPackage = "test.mod"
+internal const val TestEntryPointFile    = "TestKt"
+
 private const val      SvJsonField = """"schemaVersion":1"""
 private const val      IdJsonField = """"id":"$TestModId""""
 private const val VersionJsonField = """"version":"$TestModVersion""""

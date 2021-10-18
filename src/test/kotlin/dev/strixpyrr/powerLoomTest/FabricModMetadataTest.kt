@@ -13,13 +13,16 @@
 // limitations under the License.
 package dev.strixpyrr.powerLoomTest
 
-import dev.strixpyrr.powerLoom.metadata.ContactInfo
-import dev.strixpyrr.powerLoom.metadata.FabricMod
+import dev.strixpyrr.powerLoom.metadata.*
+import dev.strixpyrr.powerLoom.metadata.FabricMod.Licenses.Apache
 import dev.strixpyrr.powerLoomTest.FabricModMetadataTest.testContactInfo
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import okio.Buffer
+import java.io.ObjectInputStream
+import java.io.ObjectOutputStream
+import kotlin.io.path.Path
 
 @Suppress("BlockingMethodInNonBlockingContext")
 object FabricModMetadataTest : StringSpec(
@@ -72,6 +75,68 @@ object FabricModMetadataTest : StringSpec(
 		value.id      shouldBe TestModId
 		value.version shouldBe TestModVersion
 		value.contact shouldBe testContactInfo
+	}
+	
+	"MutableFabricMod serializes via Java"()
+	{
+		@Suppress("SpellCheckingInspection")
+		val data = MutableFabricMod(
+			id = TestModId,
+			version = TestModVersion,
+			jars = mutableListOf(
+				NestedJar("META-INF/jars/other.jar")
+			),
+			mixins = mutableListOf(
+				Mixin("$TestModId.mixins.json")
+			),
+			languageAdapters = mutableMapOf(
+				"non-default-language" to "*"
+			),
+			accessWidener = Path("$TestModId.accesswidener"),
+		)
+		
+		data()
+		{
+			entryPoints()
+			{
+				kotlinCommon(TestEntryPointPackage, TestEntryPointFile, "commonInit")
+				kotlinServer(TestEntryPointPackage, TestEntryPointFile, "serverInit")
+				kotlinClient(TestEntryPointPackage, TestEntryPointFile, "clientInit")
+			}
+			
+			dependencies()
+			{
+				dependOn       ("dependency",     "*")
+				recommend      ("recommendation", "*")
+				suggest        ("suggestion",     "*")
+				specifyConflict("conflict",       "*")
+				specifyBreak   ("break",          "*")
+			}
+			
+			metadata()
+			{
+				name = TestName
+				description = TestDesc
+				
+				author("TestAuthor")
+				
+				contributor("TestContributor")
+				
+				license = Apache
+				
+				icon = Icon("icon.png")
+			}
+		}
+		
+		val buffer = Buffer()
+		
+		ObjectOutputStream(
+			buffer.outputStream()
+		).use { it.writeObject(data) }
+		
+		ObjectInputStream(
+			buffer.inputStream()
+		).use { it.readObject() }
 	}
 })
 {
