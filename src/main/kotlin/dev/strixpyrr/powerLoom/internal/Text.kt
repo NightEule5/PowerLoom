@@ -208,12 +208,23 @@ private fun convertToNpmSemver(
 	end: String,
 	isStartInclusive: Boolean,
 	isEndInclusive: Boolean
-) = "${
+): String
+{
+	println(
+		"Version range intervals are not currently supported. Only the first" +
+		" part of the version range can be used."
+	)
+	
+	return "${
 		if (isStartInclusive) ">=" else ">"
-	} $start ${
-		if (isEndInclusive) ">=" else ">"
-	} $end"
+	}$start"
+}
+//	"${
+//		if (isStartInclusive) ">=" else ">"
+//	}$start${
+//		if (isEndInclusive) ">=" else ">"
+//	}$end"
 
-private fun String.convertToNpmSemver() = ">= $this"
+private fun String.convertToNpmSemver() = ">=$this"
 
-private fun String.convertPrefixToNpmSemver() = substring(0, length - 2) + 'x'
+private fun String.convertPrefixToNpmSemver() = substring(0, length - 1) + 'x'
