@@ -1,3 +1,4 @@
+@file:Suppress("UnstableApiUsage")
 
 import dev.strixpyrr.shorthand.CompilerArgumentScope.Companion.RequiresOptIn
 import dev.strixpyrr.shorthand.JvmDefaultMode.All
@@ -8,7 +9,7 @@ import dev.strixpyrr.shorthand.getting
 plugins {
 	kotlin("jvm")                  version "1.6.0-RC"
 	kotlin("plugin.serialization") version "1.6.0-RC"
-	id("dev.strixpyrr.shorthand")
+	alias(deps.plugins.shorthand)
 	`maven-publish`
 	`java-gradle-plugin`
 }
