@@ -30,9 +30,11 @@ dependencies()
 	implementation(gradleApi())
 	implementation(gradleKotlinDsl())
 	
-	implementation(deps.okio)
 	implementation(deps.kotlinx.serialization.json)
 	implementation(deps.fabric.loom)
+	implementation(deps.square.okio)
+	implementation(deps.square.retrofit)
+	implementation(deps.retrofitSerializationConverter)
 	
 	testImplementation(deps.kotest)
 	testImplementation(gradleTestKit())
