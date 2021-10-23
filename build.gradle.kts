@@ -1,15 +1,16 @@
 @file:Suppress("UnstableApiUsage")
 
+import dev.strixpyrr.shorthand.*
 import dev.strixpyrr.shorthand.CompilerArgumentScope.Companion.RequiresOptIn
 import dev.strixpyrr.shorthand.JvmDefaultMode.All
-import dev.strixpyrr.shorthand.creating
-import dev.strixpyrr.shorthand.freeCompilerArgs
-import dev.strixpyrr.shorthand.getting
+import de.undercouch.gradle.tasks.download.Download as Download
 
 plugins {
 	kotlin("jvm")                  version "1.6.0-RC"
 	kotlin("plugin.serialization") version "1.6.0-RC"
 	alias(deps.plugins.shorthand)
+	alias(deps.plugins.openapi  )
+	alias(deps.plugins.download )
 	`maven-publish`
 	`java-gradle-plugin`
 }
@@ -31,14 +32,19 @@ dependencies()
 	implementation(gradleKotlinDsl())
 	
 	implementation(deps.kotlinx.serialization.json)
+	implementation(deps.kotlinx.couroutines.core)
 	implementation(deps.fabric.loom)
 	implementation(deps.square.okio)
 	implementation(deps.square.retrofit)
+	implementation(deps.square.retrofit.scalars)
+	implementation(deps.square.okhttp3.logging)
 	implementation(deps.retrofitSerializationConverter)
 	
 	testImplementation(deps.kotest)
 	testImplementation(gradleTestKit())
 }
+
+val openApiOutPath = "$buildDir/generated-sources/openapi"
 
 kotlin()
 {
@@ -60,7 +66,20 @@ kotlin()
 			}
 		}
 	}
+	
+	sourceSets()
+	{
+		main()
+		{
+			kotlin.run()
+			{
+				srcDir("$openApiOutPath/src/main/kotlin")
+			}
+		}
+	}
 }
+
+val openApiSpecPath = "$buildDir/openapi-specs/modrinth.yaml"
 
 tasks()
 {
@@ -74,6 +93,44 @@ tasks()
 		// Why tf is this not done by default? O_o
 		dependsOn("pluginUnderTestMetadata")
 	}
+	
+	val downloadModrinthOpenApiSpec: Download by creating()
+	{
+		src("https://docs.modrinth.com/openapi.yaml")
+		
+		dest(openApiSpecPath)
+		
+		overwrite(false)
+	}
+	
+	val openApiGenerate by getting()
+	{
+		dependsOn(downloadModrinthOpenApiSpec)
+	}
+}
+
+openApiGenerate()
+{
+	generatorName("kotlin")
+	
+	inputSpec(openApiSpecPath)
+	outputDir(openApiOutPath)
+	
+	library("jvm-retrofit2")
+	
+	val basePackage = "dev.strixpyrr.powerLoom.modDistributionPlatforms.modrinth"
+	
+		apiPackage(basePackage)
+	invokerPackage(basePackage)
+	  modelPackage(basePackage)
+	modelNamePrefix("Modrinth")
+	
+	configOptions += mapOf(
+		"enumPropertyNaming"   to "PascalCase",
+		"useCoroutines"        to "true",
+		"serializationLibrary" to "kotlinx_serialization",
+		"apiSuffix"            to "Service"
+	)
 }
 
 gradlePlugin()
