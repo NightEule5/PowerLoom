@@ -116,6 +116,8 @@ openApiGenerate()
 	inputSpec(openApiSpecPath)
 	outputDir(openApiOutPath)
 	
+	ignoreFileOverride("$rootDir/.openapi-generator-ignore")
+	
 	library("jvm-retrofit2")
 	
 	val basePackage = "dev.strixpyrr.powerLoom.modDistributionPlatforms.modrinth"
