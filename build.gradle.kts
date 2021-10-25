@@ -71,10 +71,7 @@ kotlin()
 	{
 		main()
 		{
-			kotlin.run()
-			{
-				srcDir("$openApiOutPath/src/main/kotlin")
-			}
+			kotlin.srcDir(openApiOutPath)
 		}
 	}
 }
@@ -106,6 +103,14 @@ tasks()
 	val openApiGenerate by getting()
 	{
 		dependsOn(downloadModrinthOpenApiSpec)
+		
+		doLast()
+		{
+			delete(
+				"$openApiOutPath/gradle",
+				"$openApiOutPath/.openapi-generator"
+			)
+		}
 	}
 }
 
@@ -121,18 +126,19 @@ openApiGenerate()
 	// Retrofit generation is broken, we'll just use the default for now.
 	// library("jvm-retrofit2")
 	
-	val basePackage = "dev.strixpyrr.powerLoom.modDistributionPlatforms.modrinth"
+	val packageName = "dev.strixpyrr.powerLoom.modDistributionPlatforms.modrinth"
 	
-		apiPackage(basePackage)
-	invokerPackage(basePackage)
-	  modelPackage(basePackage)
+	modelPackage(packageName)
+	  apiPackage(packageName)
+	
 	modelNamePrefix("Modrinth")
 	
 	configOptions += mapOf(
 		"enumPropertyNaming"   to "PascalCase",
 		"useCoroutines"        to "true",
 		"serializationLibrary" to "kotlinx_serialization",
-		"apiSuffix"            to "Service"
+		"apiSuffix"            to "Service",
+		"sourceFolder"         to "."
 	)
 }
 
