@@ -13,6 +13,8 @@
 // limitations under the License.
 package dev.strixpyrr.powerLoomTest
 
+import dev.strixpyrr.powerLoom.modDistributionPlatforms.Modrinth
+import dev.strixpyrr.powerLoom.modDistributionPlatforms.ModrinthProjects
 import dev.strixpyrr.powerLoom.modDistributionPlatforms.modrinth.facets
 import dev.strixpyrr.powerLoom.modDistributionPlatforms.modrinth.format
 import dev.strixpyrr.powerLoomTest.ModrinthTest.Category
@@ -75,6 +77,21 @@ object ModrinthTest : StringSpec(
 		
 		orExpression[0] shouldBe VersionsFacet1
 		orExpression[1] shouldBe VersionsFacet2
+	}
+	
+	val stagingClient = Modrinth.createClient(staging = true)
+	
+	val projectsService = stagingClient.projects
+	
+	@Suppress("SpellCheckingInspection")
+	"Projects Service: GetProject retrieves \"freeeedom\""()
+	{
+		ModrinthProjects.get(projectsService, "freeeedom")
+	}
+	
+	"Projects Service: SearchProjects yields results"()
+	{
+		ModrinthProjects.search(projectsService).hits.shouldNotBeNullOrEmpty()
 	}
 })
 {
