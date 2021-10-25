@@ -20,17 +20,22 @@ internal object ModrinthProjects
 {
 	@JvmStatic
 	suspend fun get(service: Service, id: String) =
-		service.value.getProject(id).body()
+		service.value.getProject(id)
 	
 	@JvmStatic
 	suspend fun search(service: Service, query: String) =
-		service.value.searchProjects(query)
+		service.value.searchProjects(query, null, null, null, null, null, null)
 	
 	@JvmStatic
 	suspend fun search(service: Service, query: String, facets: FacetSet) =
 		service.value.searchProjects(
 			query,
-			facets = facets.list
+			facets = facets.list,
+			null,
+			null,
+			null,
+			null,
+			null
 		)
 	
 	@JvmInline

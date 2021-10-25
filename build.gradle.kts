@@ -118,7 +118,8 @@ openApiGenerate()
 	
 	ignoreFileOverride("$rootDir/.openapi-generator-ignore")
 	
-	library("jvm-retrofit2")
+	// Retrofit generation is broken, we'll just use the default for now.
+	// library("jvm-retrofit2")
 	
 	val basePackage = "dev.strixpyrr.powerLoom.modDistributionPlatforms.modrinth"
 	

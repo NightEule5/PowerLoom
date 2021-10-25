@@ -13,7 +13,10 @@
 // limitations under the License.
 package dev.strixpyrr.powerLoom.modDistributionPlatforms
 
-import org.openapitools.client.infrastructure.ApiClient
+import dev.strixpyrr.powerLoom.modDistributionPlatforms.modrinth.AuthService
+import dev.strixpyrr.powerLoom.modDistributionPlatforms.modrinth.ProjectsService
+import dev.strixpyrr.powerLoom.modDistributionPlatforms.modrinth.UsersService
+import dev.strixpyrr.powerLoom.modDistributionPlatforms.modrinth.VersionsService
 
 internal object Modrinth
 {
@@ -21,26 +24,21 @@ internal object Modrinth
 	fun createClient(staging: Boolean = false) = Client(staging)
 	
 	@JvmStatic
-	fun createApiClient(staging: Boolean) =
-		ApiClient(
-			baseUrl = "https://${
-				if (staging) "staging-" else ""
-			}api.modrinth.com/v2/"
-		)
-	
-	private inline fun <reified S> ApiClient.createService() =
-		createService(S::class.java)
+	fun apiUrl(staging: Boolean) =
+		"https://${
+			if (staging) "staging-" else ""
+		}api.modrinth.com/v2/"
 	
 	@JvmInline
 	value class Client private constructor(
-		private val client: ApiClient
+		private val url: String
 	)
 	{
-		constructor(staging: Boolean) : this(createApiClient(staging))
+		constructor(staging: Boolean) : this(apiUrl(staging))
 		
-		val auth     get() = ModrinthAuth    .Service(client.createService())
-		val projects get() = ModrinthProjects.Service(client.createService())
-		val users    get() = ModrinthUsers   .Service(client.createService())
-		val versions get() = ModrinthVersions.Service(client.createService())
+		val auth     get() = ModrinthAuth    .Service(    AuthService(url))
+		val projects get() = ModrinthProjects.Service(ProjectsService(url))
+		val users    get() = ModrinthUsers   .Service(   UsersService(url))
+		val versions get() = ModrinthVersions.Service(VersionsService(url))
 	}
 }
