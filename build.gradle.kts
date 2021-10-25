@@ -123,6 +123,8 @@ openApiGenerate()
 	
 	ignoreFileOverride("$rootDir/.openapi-generator-ignore")
 	
+	templateDir("$rootDir/src/main/resources/templates")
+	
 	// Retrofit generation is broken, we'll just use the default for now.
 	// library("jvm-retrofit2")
 	
