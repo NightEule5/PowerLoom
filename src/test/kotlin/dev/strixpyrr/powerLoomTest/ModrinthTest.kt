@@ -13,7 +13,7 @@
 // limitations under the License.
 package dev.strixpyrr.powerLoomTest
 
-import dev.strixpyrr.powerLoom.modDistributionPlatforms.modrinth.FacetSet
+import dev.strixpyrr.powerLoom.modDistributionPlatforms.modrinth.facets
 import dev.strixpyrr.powerLoom.modDistributionPlatforms.modrinth.format
 import dev.strixpyrr.powerLoomTest.ModrinthTest.Category
 import dev.strixpyrr.powerLoomTest.ModrinthTest.CategoryFacet
@@ -52,10 +52,7 @@ object ModrinthTest : StringSpec(
 	
 	"Facets: \"and\" translates to top level"()
 	{
-		val facets = FacetSet()
-		{
-			version1 and projType and license
-		}.list
+		val facets = facets { version1 and projType and license }
 		
 		facets shouldHaveSize 3
 		
@@ -68,10 +65,7 @@ object ModrinthTest : StringSpec(
 	
 	"Facets: \"or\" translates to nested"()
 	{
-		val facets = FacetSet()
-		{
-			version1 or version2
-		}.list
+		val facets = facets { version1 or version2 }
 		
 		facets shouldHaveSize 1
 		

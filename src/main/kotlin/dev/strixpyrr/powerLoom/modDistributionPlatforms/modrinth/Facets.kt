@@ -15,49 +15,58 @@ package dev.strixpyrr.powerLoom.modDistributionPlatforms.modrinth
 
 import dev.strixpyrr.powerLoom.modDistributionPlatforms.modrinth.FacetKey.*
 
+internal typealias FacetElement = Pair<FacetKey, String>
+
+internal typealias NestedMutableList<T> = MutableList<MutableList<T>>
+
+internal fun facets(facet: FacetElement) = facets { single(facet) }
+
+internal inline fun facets(block: FacetContainer.() -> Unit) =
+	FacetContainer().apply(block).toList()
+
 // I admit, this is a bit overkill. But at least it looks nice! :D
-@JvmInline
-internal value class FacetSet(
-	val list: MutableList<MutableList<String>> = mutableListOf()
-)
+internal class FacetContainer
 {
-	private fun single(facet: Pair<FacetKey, String>) =
-		Or(
-			mutableListOf<String>().also { list += it }
-		)
+	private val andExpression = And()
 	
-	infix fun Pair<FacetKey, String>.or(facet: Pair<FacetKey, String>) = single(facet) or facet
+	fun single(facet: FacetElement) = andExpression and facet
 	
-	infix fun Pair<FacetKey, String>.and(facet: Pair<FacetKey, String>) =
-		And(list) and this and facet
+	fun single(or: Or) = andExpression and or
 	
-	infix fun Or.or(facet: Pair<FacetKey, String>) = apply()
-	{
-		value += facet.format()
-	}
+	infix fun FacetElement.and(other: FacetElement) =
+		andExpression and this and other
 	
-	infix fun Or.and(facet: Pair<FacetKey, String>) = this and single(facet)
+	infix fun FacetElement.and(other: Or) =
+		andExpression and this and other
 	
-	infix fun Or.and(facet: Or) = And(list)
-	
-	infix fun And.and(facet: Pair<FacetKey, String>) = this and single(facet)
-	
-	infix fun And.and(facet: Or) = this
-	
-	@JvmInline
-	value class Or(
-		val value: MutableList<String>
-	)
+	infix fun FacetElement.or(other: FacetElement) =
+		Or().also { andExpression and (it or this or other) }
 	
 	@JvmInline
 	value class And(
-		private val list: MutableList<MutableList<String>>
+		val orExpressions: NestedMutableList<String> = mutableListOf()
 	)
-	
-	companion object
 	{
-		inline operator fun invoke(block: FacetSet.() -> Unit) = FacetSet().apply(block)
+		infix fun and(other: FacetElement) = and(Or(other))
+		
+		infix fun and(other: Or) = apply { orExpressions += other.facets }
 	}
+	
+	@JvmInline
+	value class Or(
+		val facets: MutableList<String> = mutableListOf()
+	)
+	{
+		constructor(
+			facet: FacetElement
+		) : this(
+			mutableListOf(facet.format())
+		)
+		
+		infix fun or(other: FacetElement) = apply { facets += other.format() }
+	}
+	
+	fun toList() = andExpression.orExpressions
 }
 
 internal enum class FacetKey
@@ -68,7 +77,7 @@ internal enum class FacetKey
 	ProjectType
 }
 
-internal fun Pair<FacetKey, String>.format(): String
+internal fun FacetElement.format(): String
 {
 	val (key, value) = this
 	

@@ -13,7 +13,7 @@
 // limitations under the License.
 package dev.strixpyrr.powerLoom.modDistributionPlatforms
 
-import dev.strixpyrr.powerLoom.modDistributionPlatforms.modrinth.FacetSet
+import dev.strixpyrr.powerLoom.modDistributionPlatforms.modrinth.FacetContainer
 import dev.strixpyrr.powerLoom.modDistributionPlatforms.modrinth.ProjectsService
 
 internal object ModrinthProjects
@@ -27,10 +27,10 @@ internal object ModrinthProjects
 		service.value.searchProjects(query, null, null, null, null, null, null)
 	
 	@JvmStatic
-	suspend fun search(service: Service, query: String, facets: FacetSet) =
+	suspend fun search(service: Service, query: String, facets: FacetContainer) =
 		service.value.searchProjects(
 			query,
-			facets = facets.list,
+			facets = facets.toList(),
 			null,
 			null,
 			null,
