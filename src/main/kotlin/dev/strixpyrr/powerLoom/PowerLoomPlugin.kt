@@ -67,5 +67,7 @@ class PowerLoomPlugin : Plugin<Project>
 		
 		if (props[PullMetadataFromProject])
 			target.afterEvaluate(mod::populateFrom)
+		
+		target.applyModDistExtensions()
 	}
 }
