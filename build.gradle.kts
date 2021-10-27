@@ -112,6 +112,11 @@ tasks()
 			)
 		}
 	}
+	
+	val processResources: Copy by getting()
+	{
+		exclude("templates")
+	}
 }
 
 openApiGenerate()
