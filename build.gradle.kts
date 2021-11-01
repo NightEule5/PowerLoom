@@ -42,6 +42,10 @@ dependencies()
 	implementation(deps.retrofitSerializationConverter)
 	implementation(deps.mordant)
 	
+	compileOnly(deps.kotlinx.serialization.properties)
+	compileOnly(deps.charleskorn.kaml)
+	compileOnly(deps.electronwill.nightConfig.toml)
+	
 	testImplementation(deps.kotest)
 	testImplementation(gradleTestKit())
 }

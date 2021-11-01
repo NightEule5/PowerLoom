@@ -19,6 +19,28 @@ import dev.strixpyrr.powerLoom.metadata.FabricMod.Companion.IdRegex
 import kotlin.math.min
 import kotlin.text.RegexOption.COMMENTS
 
+// Mod Id conversion
+
+private val WordDelimiters = charArrayOf('-', '_')
+
+internal fun String.toCamelCase(): String
+{
+	val scratch = StringBuilder(length)
+	
+	var o = 0
+	var i = indexOfAny(WordDelimiters)
+	
+	while (i > -1)
+	{
+		scratch.append(this, o, i)
+		
+		o = i + 1
+		i = indexOfAny(WordDelimiters, startIndex = o)
+	}
+	
+	return "$scratch"
+}
+
 /**
  * Converts an input project name string into a valid mod Id. The input cannot be
  * empty, and must not start with a digit.
@@ -144,6 +166,8 @@ internal fun String.toModId(): String
 
 private inline operator fun StringBuilder.plusAssign(value: Char  ) { append(value) }
 private inline operator fun StringBuilder.plusAssign(value: String) { append(value) }
+
+// Version ranges
 
 @Suppress("RegExpRepeatedSpace") // Comments Regex option is set.
 private val GradleVersionRangeRegex =
