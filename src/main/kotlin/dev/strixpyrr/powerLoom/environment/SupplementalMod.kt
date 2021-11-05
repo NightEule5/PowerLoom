@@ -40,7 +40,38 @@ class SupplementalMod internal constructor(val id: String)
 	
 	var optional = true
 	
-	var presenceVar = id.toCamelCase()
+	/**
+	 * The name of a variable that sets whether this mod will be downloaded to the
+	 * environment. Ignored for required mods. Defaults to a camelCase variation of
+	 * [id].
+	 *
+	 * Optional mods are downloaded by default. They can be disabled by setting the
+	 * presence variable in the following places:
+	 * - In your `gradle.properties`, prefixed by "powerLoom.environment.mods."
+	 * ```properties
+	 * powerLoom.environment.mods.[modId] = false
+	 * ```
+	 * - In `project.ext`, prefixed by "download"
+	 * ```kotlin
+	 * project.ext["download[ModId]"] = false`)
+	 * ```
+	 * - In your environment variables, prefixed by "download_". These are not
+	 * case-sensitive.
+	 * ```
+	 * DOWNLOAD_[MODID] = false
+	 * ```
+	 */
+	var presenceVar = ""
+		get() = field.ifEmpty()
+		{
+			id.toCamelCase().also { field = it }
+		}
+		set(value)
+		{
+			require(value.isNotEmpty())
+			
+			field = value
+		}
 	
 	val includedSources: MutableSet<ModSourceInclusion> = enumSetOfAll()
 	
