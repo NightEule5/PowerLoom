@@ -23,7 +23,7 @@ import kotlin.text.RegexOption.COMMENTS
 
 private val WordDelimiters = charArrayOf('-', '_')
 
-internal fun String.toCamelCase(): String
+internal fun String.modIdToCamelCase(): String
 {
 	val scratch = StringBuilder(length)
 	
@@ -40,6 +40,9 @@ internal fun String.toCamelCase(): String
 	
 	return "$scratch"
 }
+
+internal fun String.camelCaseToPascal() =
+	"${this[0].uppercaseChar()}${substring(1)}"
 
 /**
  * Converts an input project name string into a valid mod Id. The input cannot be

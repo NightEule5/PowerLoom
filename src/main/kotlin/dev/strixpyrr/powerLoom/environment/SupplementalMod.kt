@@ -17,7 +17,7 @@ package dev.strixpyrr.powerLoom.environment
 
 import com.charleskorn.kaml.Yaml
 import dev.strixpyrr.powerLoom.internal.enumSetOfAll
-import dev.strixpyrr.powerLoom.internal.toCamelCase
+import dev.strixpyrr.powerLoom.internal.modIdToCamelCase
 import dev.strixpyrr.powerLoom.metadata.FabricMod.Companion.IdRegex
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
@@ -64,7 +64,7 @@ class SupplementalMod internal constructor(val id: String)
 	var presenceVar = ""
 		get() = field.ifEmpty()
 		{
-			id.toCamelCase().also { field = it }
+			id.modIdToCamelCase().also { field = it }
 		}
 		set(value)
 		{

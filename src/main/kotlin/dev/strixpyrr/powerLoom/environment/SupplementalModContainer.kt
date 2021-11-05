@@ -13,7 +13,11 @@
 // limitations under the License.
 package dev.strixpyrr.powerLoom.environment
 
+import dev.strixpyrr.powerLoom.internal.Property.EnvironmentMods
+import dev.strixpyrr.powerLoom.internal.PropertyContainer
 import dev.strixpyrr.powerLoom.internal.addedTo
+import dev.strixpyrr.powerLoom.internal.camelCaseToPascal
+import org.gradle.api.plugins.ExtraPropertiesExtension
 
 class SupplementalModContainer
 {
@@ -28,4 +32,35 @@ class SupplementalModContainer
 	operator fun get(id: String) =
 		mods.find { it.id == id } ?:
 		(SupplementalMod(id) addedTo mods)
+	
+	internal fun getDownloadedMods(
+		properties: PropertyContainer,
+		extra: ExtraPropertiesExtension
+	) = mods.filter()
+	{
+		if (it.optional)
+		{
+			val presenceVar = it.presenceVar
+			
+			when
+			{
+				!properties[EnvironmentMods, presenceVar]                    -> false
+				extra["download${presenceVar.camelCaseToPascal()}"] == false -> false
+				else                                                         ->
+				{
+					val envVarKey = "download_$presenceVar"
+					
+					val env = System.getenv()
+					
+					val entry = env.entries.find()
+					{ (key, _) ->
+						key.equals(envVarKey, ignoreCase = true)
+					}
+					
+					entry == null || entry.value != "false"
+				}
+			}
+		}
+		else true
+	}
 }
