@@ -18,24 +18,25 @@ package dev.strixpyrr.powerLoom.environment
 import com.charleskorn.kaml.Yaml
 import com.electronwill.nightconfig.core.CommentedConfig
 import com.electronwill.nightconfig.toml.TomlWriter
+import dev.strixpyrr.powerLoom.tasks.IHashable
+import dev.strixpyrr.powerLoom.tasks.IHashable.Companion.hash
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToStream
 import kotlinx.serialization.properties.Properties
-import okio.BufferedSink
-import okio.Source
-import okio.source
-import okio.use
+import okio.*
 import java.io.IOException
 import java.io.Writer
 import java.nio.file.Path
 
 sealed class ModConfig(
 	internal val outputPath: Path
-)
+) : IHashable
 {
 	internal abstract fun write(sink: BufferedSink)
+	
+	override fun hash() = Buffer().apply(::write).hash()
 }
 
 internal class StringModConfig(
@@ -44,6 +45,8 @@ internal class StringModConfig(
 ) : ModConfig(outputPath)
 {
 	override fun write(sink: BufferedSink) = write(text, sink)
+	
+	override fun hash() = text.hash()
 }
 
 internal class ResourceModConfig(

@@ -13,12 +13,11 @@
 // limitations under the License.
 package dev.strixpyrr.powerLoom.internal
 
-import okio.BufferedSource
-import okio.buffer
-import okio.sink
+import okio.*
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption.CREATE
 import java.nio.file.StandardOpenOption.TRUNCATE_EXISTING
+import kotlin.io.use
 
 // Todo: Move to kit-io.
 internal fun BufferedSource.writeTo(
@@ -41,3 +40,5 @@ private fun toOpenOptionsArray(create: Boolean, replace: Boolean) =
 		if (replace)
 			arrayOf(TRUNCATE_EXISTING)
 		else emptyArray()
+
+internal fun Path.hashSha256() = source().use { HashingSource.sha256(it).hash }
