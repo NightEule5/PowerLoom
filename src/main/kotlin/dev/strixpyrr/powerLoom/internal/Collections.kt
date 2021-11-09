@@ -16,3 +16,13 @@ package dev.strixpyrr.powerLoom.internal
 // Todo: Move to kit-collections
 internal infix fun <T> T.addedTo(collection: MutableCollection<in T>) =
 	also(collection::add)
+
+@OptIn(ExperimentalStdlibApi::class)
+internal inline fun <T, Xk, Xv> Collection<T>.flatAssociateBy(
+	allocation: Int,
+	transform: (T) -> Map<Xk, Xv>
+) = buildMap(size * allocation)
+{
+	for (value in this@flatAssociateBy)
+		this += transform(value)
+}

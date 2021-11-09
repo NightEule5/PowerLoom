@@ -16,6 +16,7 @@ package dev.strixpyrr.powerLoom.tasks
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 
 private const val GenerateModMetadataName = "generateModMetadata"
+internal const val WriteModConfigsName = "writeModConfigs"
 
 @Suppress("UnstableApiUsage")
 internal fun KotlinSourceSet.toGenerateModMetadataName() =
