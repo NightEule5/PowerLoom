@@ -13,16 +13,13 @@
 // limitations under the License.
 package dev.strixpyrr.powerLoom.tasks
 
-import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
+import org.gradle.api.DefaultTask
+import javax.inject.Inject
 
-private  const val   GenerateModMetadataName = "generateModMetadata"
-internal const val PrepareModEnvironmentName = "prepareModEnvironment"
-internal const val       WriteModConfigsName = "writeModConfigs"
-
-@Suppress("UnstableApiUsage")
-internal fun KotlinSourceSet.toGenerateModMetadataName() =
-	if (name == "main")
-		GenerateModMetadataName
-	else "generate${name}ModMetadata"
-
-internal const val TaskGroup = "power loom"
+class PrepareModEnvironmentTask @Inject internal constructor() : DefaultTask()
+{
+	init
+	{
+		group = TaskGroup
+	}
+}

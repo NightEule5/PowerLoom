@@ -17,13 +17,12 @@ import dev.strixpyrr.powerLoom.internal.Property.CreateDefaultTasks
 import dev.strixpyrr.powerLoom.internal.Property.PullMetadataFromProject
 import dev.strixpyrr.powerLoom.internal.get
 import dev.strixpyrr.powerLoom.internal.properties
-import dev.strixpyrr.powerLoom.tasks.GenerateModMetadataTask
-import dev.strixpyrr.powerLoom.tasks.WriteModConfigsName
-import dev.strixpyrr.powerLoom.tasks.WriteModConfigsTask
-import dev.strixpyrr.powerLoom.tasks.toGenerateModMetadataName
+import dev.strixpyrr.powerLoom.tasks.*
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.kotlin.dsl.create
+import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 
@@ -31,11 +30,15 @@ class PowerLoomPlugin : Plugin<Project>
 {
 	override fun apply(target: Project)
 	{
+		var hasLoom = false
+		
 		target.plugins.run()
 		{
 			if (!hasPlugin("org.jetbrains.kotlin.jvm"          ) &&
 			    !hasPlugin("org.jetbrains.kotlin.multiplatform"))
 				throw Exception("The Kotlin plugin is not applied.")
+			
+			hasLoom = hasPlugin("fabric-loom")
 		}
 		
 		val props = target.properties()
@@ -69,6 +72,26 @@ class PowerLoomPlugin : Plugin<Project>
 				register<WriteModConfigsTask>(WriteModConfigsName)
 				{
 					populate(mod.environment.mods.getDownloadedMods())
+				}
+				
+				register<PrepareModEnvironmentTask>(PrepareModEnvironmentName)
+				{
+					dependsOn(WriteModConfigsName)
+				}
+				
+				if (hasLoom)
+				{
+					// Hook mod environment preparation in fabric-loom.
+					
+					named<Task>("runClient")
+					{
+						finalizedBy(PrepareModEnvironmentName)
+					}
+					
+					named<Task>("runServer")
+					{
+						finalizedBy(PrepareModEnvironmentName)
+					}
 				}
 			}
 		}
