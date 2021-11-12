@@ -18,10 +18,13 @@ import dev.strixpyrr.powerLoom.internal.Property.PullMetadataFromProject
 import dev.strixpyrr.powerLoom.internal.get
 import dev.strixpyrr.powerLoom.internal.properties
 import dev.strixpyrr.powerLoom.tasks.GenerateModMetadataTask
+import dev.strixpyrr.powerLoom.tasks.WriteModConfigsName
+import dev.strixpyrr.powerLoom.tasks.WriteModConfigsTask
 import dev.strixpyrr.powerLoom.tasks.toGenerateModMetadataName
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.create
+import org.gradle.kotlin.dsl.register
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 
 class PowerLoomPlugin : Plugin<Project>
@@ -61,6 +64,11 @@ class PowerLoomPlugin : Plugin<Project>
 						create<GenerateModMetadataTask>(it.toGenerateModMetadataName())
 							.fromSourceSet(it)
 					}
+				}
+				
+				register<WriteModConfigsTask>(WriteModConfigsName)
+				{
+					populate(mod.environment.mods.getDownloadedMods())
 				}
 			}
 		}
