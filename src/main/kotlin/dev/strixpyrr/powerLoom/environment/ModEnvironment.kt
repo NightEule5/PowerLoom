@@ -16,11 +16,11 @@ package dev.strixpyrr.powerLoom.environment
 import org.gradle.api.Project
 
 class ModEnvironment internal constructor(
-	private val project: Project
+	project: Project
 )
 {
 	val sources = ModSourceContainer()
-	val mods    = SupplementalModContainer()
+	val mods    = SupplementalModContainer(project)
 	
 	inline operator fun invoke(populate: ModEnvironment.() -> Unit) = populate()
 }
