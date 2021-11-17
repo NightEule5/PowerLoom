@@ -6,8 +6,8 @@ import dev.strixpyrr.shorthand.JvmDefaultMode.All
 import de.undercouch.gradle.tasks.download.Download as Download
 
 plugins {
-	kotlin("jvm")                  version "1.6.0-RC"
-	kotlin("plugin.serialization") version "1.6.0-RC"
+	kotlin("jvm")                  version "1.6.0"
+	kotlin("plugin.serialization") version "1.6.0"
 	alias(deps.plugins.shorthand)
 	alias(deps.plugins.openapi  )
 	alias(deps.plugins.download )
@@ -61,7 +61,7 @@ kotlin()
 			it.kotlinOptions.run()
 			{
 				jvmTarget       = "1.8"
-				languageVersion = "1.5"
+				languageVersion = "1.6"
 				
 				freeCompilerArgs()
 				{
