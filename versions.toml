@@ -1,5 +1,5 @@
 [versions]
-okio    = { strictly = "[3.0,3.1[" }
+okio    = { strictly = "[3.0,3.1[",   prefer = "3.0.0"          }
 kxsJson = { strictly = "[1.3,1.4[",   prefer = "1.3.0"          }
 loom    = { strictly = "[0.10,0.11[", prefer = "0.10.31"        }
 
