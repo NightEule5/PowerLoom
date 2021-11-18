@@ -11,18 +11,21 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package dev.strixpyrr.powerLoom.tasks
+package dev.strixpyrr.powerLoomTest
 
-import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
+import io.kotest.matchers.collections.shouldNotBeEmpty
+import io.kotest.matchers.nulls.shouldNotBeNull
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 
-private  const val   GenerateModMetadataName = "generateModMetadata"
-internal const val PrepareModEnvironmentName = "prepareModEnvironment"
-internal const val       WriteModConfigsName = "writeModConfigs"
-
-@Suppress("UnstableApiUsage")
-internal fun KotlinSourceSet.toGenerateModMetadataName() =
-	if (name == "main")
-		GenerateModMetadataName
-	else "generate${name}ModMetadata"
-
-internal const val TaskGroup = "power loom"
+@OptIn(ExperimentalContracts::class)
+internal fun Collection<*>?.shouldNotBeNullOrEmpty()
+{
+	contract()
+	{
+		returns() implies (this@shouldNotBeNullOrEmpty != null)
+	}
+	
+	shouldNotBeNull ()
+	shouldNotBeEmpty()
+}

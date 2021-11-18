@@ -11,18 +11,14 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package dev.strixpyrr.powerLoom.tasks
+package dev.strixpyrr.powerLoom.modDistributionPlatforms
 
-import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
+import dev.strixpyrr.powerLoom.modDistributionPlatforms.modrinth.AuthService
 
-private  const val   GenerateModMetadataName = "generateModMetadata"
-internal const val PrepareModEnvironmentName = "prepareModEnvironment"
-internal const val       WriteModConfigsName = "writeModConfigs"
-
-@Suppress("UnstableApiUsage")
-internal fun KotlinSourceSet.toGenerateModMetadataName() =
-	if (name == "main")
-		GenerateModMetadataName
-	else "generate${name}ModMetadata"
-
-internal const val TaskGroup = "power loom"
+internal object ModrinthAuth
+{
+	@JvmInline
+	value class Service(
+		val value: AuthService
+	)
+}

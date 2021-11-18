@@ -13,6 +13,7 @@
 // limitations under the License.
 package dev.strixpyrr.powerLoom.metadata
 
+import dev.strixpyrr.powerLoom.ModDependency
 import dev.strixpyrr.powerLoom.internal.toModDepVersion
 import dev.strixpyrr.powerLoom.internal.toModId
 import org.gradle.api.artifacts.Configuration
@@ -27,7 +28,7 @@ internal fun DependencyContainer.populateFrom(configuration: Configuration)
 
 private fun Dependency.toModDependency(container: DependencyContainer)
 {
-	val modId = name.toModId()
+	val modId = if (this is ModDependency) toModId() else name.toModId()
 	
 	when (this)
 	{

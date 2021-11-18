@@ -1,10 +1,39 @@
 [versions]
-okio    = { strictly = "[3.0,3.1[" }
-kxsJson = { strictly = "[1.3,1.4[",   prefer = "1.3.0"          }
-loom    = { strictly = "[0.10,0.11[", prefer = "0.10.31"        }
+kxsJson      = { strictly = "[1.3,1.4)",   prefer = "1.3.0"   }
+kxCoroutines = { strictly = "[1.5,1.6)",   prefer = "1.5.2"   }
+loom         = { strictly = "[0.10,0.11)", prefer = "0.10.31" }
+kotest       = { strictly = "[5.0,5.1)", prefer = "5.0.0.M3" }
+okio         = { strictly = "[3.0,3.1)"  }
+okhttp       = { strictly = "[4.9,4.10)" }
+retrofit     = { strictly = "[2.9,2.10)" }
+mordant      = { strictly = "[2.0,2.1)"  }
 
 [libraries]
-okio                       = { group = "com.squareup.okio",     name = "okio",                       version.ref = "okio"     }
-kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kxsJson"  }
-kotest                     = { group = "io.kotest",             name = "kotest-runner-junit5",       version     = "5.0.0.M2" }
-fabric-loom                = { group = "net.fabricmc",          name = "fabric-loom",                version.ref = "loom"     }
+fabric-loom                = { group = "net.fabricmc",           name = "fabric-loom",                version.ref = "loom"         }
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx",  name = "kotlinx-serialization-json", version.ref = "kxsJson"      }
+kotlinx-couroutines-core   = { group = "org.jetbrains.kotlinx",  name = "kotlinx-coroutines-core",    version.ref = "kxCoroutines" }
+square-okio                = { group = "com.squareup.okio",      name = "okio",                       version.ref = "okio"         }
+square-retrofit2           = { group = "com.squareup.retrofit2", name = "retrofit",                   version.ref = "retrofit"     }
+square-retrofit2-scalars   = { group = "com.squareup.retrofit2", name = "converter-scalars",          version.ref = "retrofit"     }
+square-okhttp3             = { group = "com.squareup.okhttp3",   name = "okhttp",                     version.ref = "okhttp"       }
+square-okhttp3-logging     = { group = "com.squareup.okhttp3",   name = "logging-interceptor",        version.ref = "okhttp"       }
+
+mordant = { group = "com.github.ajalt.mordant", name = "mordant", version.ref = "mordant" }
+
+# Configs
+charleskorn-kaml = { group = "com.charleskorn.kaml", name = "kaml", version = "0.36.0" }
+kotlinx-serialization-properties = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-properties", version = "1.3.0" }
+electronwill-nightConfig-toml = { group = "com.electronwill.night-config", name = "toml", version = "3.6.4" }
+
+# Test
+kotest                           = { group = "io.kotest",              name = "kotest-runner-junit5",             version.ref = "kotest"        }
+
+[libraries.retrofitSerializationConverter]
+group   = "com.jakewharton.retrofit"
+name    = "retrofit2-kotlinx-serialization-converter"
+version = "0.8.0"
+
+[plugins]
+shorthand = { id = "dev.strixpyrr.shorthand", version = "0.0.5" }
+openapi   = { id = "org.openapi.generator",   version = "5.3.0" }
+download  = { id = "de.undercouch.download",  version = "4.1.2" }

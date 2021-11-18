@@ -13,16 +13,16 @@
 // limitations under the License.
 package dev.strixpyrr.powerLoom.internal
 
-import dev.strixpyrr.powerLoom.internal.Property.CreateDefaultTasks
-import dev.strixpyrr.powerLoom.internal.Property.PullMetadataFromProject
+import dev.strixpyrr.powerLoom.internal.Property.*
 import org.gradle.api.Project
 
 private const val PropertyDomain = "powerLoom"
 
 private const val      CreateDefaultTasksProperty = "$PropertyDomain.createDefaultTasks"
 private const val PullMetadataFromProjectProperty = "$PropertyDomain.pullMetadataFromProject"
+private const val         EnvironmentModsProperty = "$PropertyDomain.environment.mods"
 
-internal enum class Property { CreateDefaultTasks, PullMetadataFromProject }
+internal enum class Property { CreateDefaultTasks, PullMetadataFromProject, EnvironmentMods }
 
 @Suppress("NOTHING_TO_INLINE")
 internal inline fun Project.properties() = PropertyContainer(properties)
@@ -30,12 +30,15 @@ internal inline fun Project.properties() = PropertyContainer(properties)
 @JvmInline
 internal value class PropertyContainer(private val map: Map<String, Any?>)
 {
-	operator fun get(property: Property) = when (property)
+	@Suppress("UNCHECKED_CAST")
+	operator fun get(property: Property, key: String = "") = when (property)
 	{
 		CreateDefaultTasks      -> get(     CreateDefaultTasksProperty, default = true)
 		PullMetadataFromProject -> get(PullMetadataFromProjectProperty, default = true)
+		EnvironmentMods         -> get("$EnvironmentModsProperty.$key", default = true)
 	}
 	
+	@Suppress("SameParameterValue")
 	private fun get(property: String, default: Boolean) =
 		try
 		{
