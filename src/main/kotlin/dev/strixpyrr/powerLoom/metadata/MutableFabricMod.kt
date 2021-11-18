@@ -286,7 +286,7 @@ class MutableEntryPoints(
 				`class`  .ifEmpty { throw IllegalArgumentException(EmptyClass  ) },
 				function,
 				adapter = Kotlin
-			)
+			).also { list += it }
 		
 		private companion object
 		{
