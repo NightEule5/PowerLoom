@@ -11,18 +11,18 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package dev.strixpyrr.powerLoom.tasks
+package dev.strixpyrr.powerLoom.internal
 
-import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
+// Todo: Move to kit-collections
+internal infix fun <T> T.addedTo(collection: MutableCollection<in T>) =
+	also(collection::add)
 
-private  const val   GenerateModMetadataName = "generateModMetadata"
-internal const val PrepareModEnvironmentName = "prepareModEnvironment"
-internal const val       WriteModConfigsName = "writeModConfigs"
-
-@Suppress("UnstableApiUsage")
-internal fun KotlinSourceSet.toGenerateModMetadataName() =
-	if (name == "main")
-		GenerateModMetadataName
-	else "generate${name}ModMetadata"
-
-internal const val TaskGroup = "power loom"
+@OptIn(ExperimentalStdlibApi::class)
+internal inline fun <T, Xk, Xv> Collection<T>.flatAssociateBy(
+	allocation: Int,
+	transform: (T) -> Map<Xk, Xv>
+) = buildMap(size * allocation)
+{
+	for (value in this@flatAssociateBy)
+		this += transform(value)
+}

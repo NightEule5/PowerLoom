@@ -120,7 +120,7 @@ object MetadataGenerationTest : StringSpec(
 			name        = "projectDefaults",
 			depends     = mapOf(
 				"fabric-language-kotlin" to
-					listOf(">= 1.6.5+kotlin.1.5.31")
+					listOf(">=1.6.5+kotlin.1.5.31")
 			)
 		)
 	}

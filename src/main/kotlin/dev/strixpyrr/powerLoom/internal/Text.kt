@@ -19,6 +19,31 @@ import dev.strixpyrr.powerLoom.metadata.FabricMod.Companion.IdRegex
 import kotlin.math.min
 import kotlin.text.RegexOption.COMMENTS
 
+// Mod Id conversion
+
+private val WordDelimiters = charArrayOf('-', '_')
+
+internal fun String.modIdToCamelCase(): String
+{
+	val scratch = StringBuilder(length)
+	
+	var o = 0
+	var i = indexOfAny(WordDelimiters)
+	
+	while (i > -1)
+	{
+		scratch.append(this, o, i)
+		
+		o = i + 1
+		i = indexOfAny(WordDelimiters, startIndex = o)
+	}
+	
+	return "$scratch"
+}
+
+internal fun String.camelCaseToPascal() =
+	"${this[0].uppercaseChar()}${substring(1)}"
+
 /**
  * Converts an input project name string into a valid mod Id. The input cannot be
  * empty, and must not start with a digit.
@@ -145,6 +170,8 @@ internal fun String.toModId(): String
 private inline operator fun StringBuilder.plusAssign(value: Char  ) { append(value) }
 private inline operator fun StringBuilder.plusAssign(value: String) { append(value) }
 
+// Version ranges
+
 @Suppress("RegExpRepeatedSpace") // Comments Regex option is set.
 private val GradleVersionRangeRegex =
 	"""
@@ -208,12 +235,23 @@ private fun convertToNpmSemver(
 	end: String,
 	isStartInclusive: Boolean,
 	isEndInclusive: Boolean
-) = "${
+): String
+{
+	println(
+		"Version range intervals are not currently supported. Only the first" +
+		" part of the version range can be used."
+	)
+	
+	return "${
 		if (isStartInclusive) ">=" else ">"
-	} $start ${
-		if (isEndInclusive) ">=" else ">"
-	} $end"
+	}$start"
+}
+//	"${
+//		if (isStartInclusive) ">=" else ">"
+//	}$start${
+//		if (isEndInclusive) ">=" else ">"
+//	}$end"
 
-private fun String.convertToNpmSemver() = ">= $this"
+private fun String.convertToNpmSemver() = ">=$this"
 
-private fun String.convertPrefixToNpmSemver() = substring(0, length - 2) + 'x'
+private fun String.convertPrefixToNpmSemver() = substring(0, length - 1) + 'x'

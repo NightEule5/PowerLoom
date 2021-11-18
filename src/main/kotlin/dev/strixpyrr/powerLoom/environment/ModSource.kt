@@ -11,18 +11,24 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package dev.strixpyrr.powerLoom.tasks
+package dev.strixpyrr.powerLoom.environment
 
-import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
+import okhttp3.HttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrl
+import java.net.URL
 
-private  const val   GenerateModMetadataName = "generateModMetadata"
-internal const val PrepareModEnvironmentName = "prepareModEnvironment"
-internal const val       WriteModConfigsName = "writeModConfigs"
-
-@Suppress("UnstableApiUsage")
-internal fun KotlinSourceSet.toGenerateModMetadataName() =
-	if (name == "main")
-		GenerateModMetadataName
-	else "generate${name}ModMetadata"
-
-internal const val TaskGroup = "power loom"
+sealed class ModSource
+{
+	object Modrinth : ModSource()
+	object Curse    : ModSource()
+	object Maven    : ModSource()
+	
+	data class Url internal constructor(
+		val name : String?,
+		val value: HttpUrl
+	) : ModSource()
+	{
+		internal constructor(name: String?, value: String) : this(name, value.toHttpUrl())
+		internal constructor(name: String?, value: URL   ) : this(name, "$value"         )
+	}
+}

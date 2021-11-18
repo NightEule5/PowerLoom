@@ -11,18 +11,24 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package dev.strixpyrr.powerLoom.tasks
+package dev.strixpyrr.powerLoom
 
-import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
+import org.gradle.api.artifacts.dsl.RepositoryHandler
+import org.gradle.kotlin.dsl.maven
 
-private  const val   GenerateModMetadataName = "generateModMetadata"
-internal const val PrepareModEnvironmentName = "prepareModEnvironment"
-internal const val       WriteModConfigsName = "writeModConfigs"
+private const val   ModrinthUrl = "https://api.modrinth.com/maven"
+private const val CurseMavenUrl = "https://cursemaven.com"
 
-@Suppress("UnstableApiUsage")
-internal fun KotlinSourceSet.toGenerateModMetadataName() =
-	if (name == "main")
-		GenerateModMetadataName
-	else "generate${name}ModMetadata"
+fun RepositoryHandler.modrinth() = maven(url = ModrinthUrl).run()
+{
+	name = "Modrinth"
+	
+	content { it.includeGroup(ModrinthMavenGroup) }
+}
 
-internal const val TaskGroup = "power loom"
+fun RepositoryHandler.curseMaven() = maven(url = CurseMavenUrl).run()
+{
+	name = "CurseMaven"
+	
+	content { it.includeGroup(CurseMavenGroup) }
+}

@@ -13,16 +13,22 @@
 // limitations under the License.
 package dev.strixpyrr.powerLoom.tasks
 
-import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
+import okio.Buffer
+import okio.BufferedSource
+import okio.ByteString
+import okio.ByteString.Companion.encodeUtf8
+import okio.HashingSource
 
-private  const val   GenerateModMetadataName = "generateModMetadata"
-internal const val PrepareModEnvironmentName = "prepareModEnvironment"
-internal const val       WriteModConfigsName = "writeModConfigs"
-
-@Suppress("UnstableApiUsage")
-internal fun KotlinSourceSet.toGenerateModMetadataName() =
-	if (name == "main")
-		GenerateModMetadataName
-	else "generate${name}ModMetadata"
-
-internal const val TaskGroup = "power loom"
+interface IHashable
+{
+	fun hash(): ByteString
+	
+	companion object
+	{
+		@JvmStatic fun String.hash() = encodeUtf8().sha256()
+		
+		@JvmStatic fun BufferedSource.hash() = HashingSource.sha256(this).hash
+		
+		@JvmStatic fun Buffer.hash() = sha256()
+	}
+}

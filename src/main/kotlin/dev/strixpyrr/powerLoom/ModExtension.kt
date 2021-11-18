@@ -13,6 +13,7 @@
 // limitations under the License.
 package dev.strixpyrr.powerLoom
 
+import dev.strixpyrr.powerLoom.environment.ModEnvironment
 import dev.strixpyrr.powerLoom.internal.toModId
 import dev.strixpyrr.powerLoom.metadata.MutableFabricMod
 import org.gradle.api.Project
@@ -29,7 +30,7 @@ class ModExtension internal constructor(private val project: Project)
 	 */
 	fun embedLicense(path: Path = Path("LICENSE")) = project.embedLicense(path)
 	
-	internal fun populateFrom(project: Project) = metadata()
+	internal fun populateMetadataFrom(project: Project) = metadata()
 	{
 		id      = project.name.toModId()
 		version = "${project.version}"
@@ -41,6 +42,8 @@ class ModExtension internal constructor(private val project: Project)
 			project.description?.let { description = it }
 		}
 	}
+	
+	val environment = ModEnvironment(project)
 	
 	companion object
 	{
